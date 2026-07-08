@@ -1,0 +1,97 @@
+datasources:
+  - model_name: app_group
+    oas_endpoint: /apps/topologies.eda.nokia.com
+    oas_schema: AppGroup
+  - model_name: resource_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1
+    oas_schema: ResourceList
+  - model_name: alarm_overlay_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/alarmoverlays
+    oas_schema: com.nokia.eda.topologies.v1.AlarmOverlayList
+  - model_name: alarm_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/alarmoverlays/{name}
+    oas_schema: com.nokia.eda.topologies.v1.AlarmOverlay
+  - model_name: deviation_overlay_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/deviationoverlays
+    oas_schema: com.nokia.eda.topologies.v1.DeviationOverlayList
+  - model_name: deviation_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/deviationoverlays/{name}
+    oas_schema: com.nokia.eda.topologies.v1.DeviationOverlay
+  - model_name: lldp_overlay_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/lldpoverlays
+    oas_schema: com.nokia.eda.topologies.v1.LldpOverlayList
+  - model_name: lldp_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/lldpoverlays/{name}
+    oas_schema: com.nokia.eda.topologies.v1.LldpOverlay
+  - model_name: topology_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologies
+    oas_schema: com.nokia.eda.topologies.v1.TopologyList
+  - model_name: topology
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologies/{name}
+    oas_schema: com.nokia.eda.topologies.v1.Topology
+  - model_name: topology_grouping_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologygroupings
+    oas_schema: com.nokia.eda.topologies.v1.TopologyGroupingList
+  - model_name: topology_grouping
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologygroupings/{name}
+    oas_schema: com.nokia.eda.topologies.v1.TopologyGrouping
+  - model_name: traffic_rate_overlay_list
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/trafficrateoverlays
+    oas_schema: com.nokia.eda.topologies.v1.TrafficRateOverlayList
+  - model_name: traffic_rate_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/trafficrateoverlays/{name}
+    oas_schema: com.nokia.eda.topologies.v1.TrafficRateOverlay
+  - model_name: network_topology_list
+    oas_endpoint: /workflows/v1/topologies.eda.nokia.com/v1/namespaces/{namespace}/networktopologies
+    oas_schema: com.nokia.eda.topologies.v1.NetworkTopologyList
+  - model_name: network_topology
+    oas_endpoint: /workflows/v1/topologies.eda.nokia.com/v1/namespaces/{namespace}/networktopologies/{name}
+    oas_schema: com.nokia.eda.topologies.v1.NetworkTopology
+  - model_name: workflow_get_inputs_resp_elem
+    oas_endpoint: /workflows/v1/topologies.eda.nokia.com/v1/namespaces/{namespace}/networktopologies/{name}/_input
+    oas_schema: WorkflowGetInputsRespElem
+
+resources:
+  - model_name: alarm_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/alarmoverlays
+    oas_schema: com.nokia.eda.topologies.v1.AlarmOverlay
+  - model_name: deviation_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/deviationoverlays
+    oas_schema: com.nokia.eda.topologies.v1.DeviationOverlay
+  - model_name: lldp_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/lldpoverlays
+    oas_schema: com.nokia.eda.topologies.v1.LldpOverlay
+  - model_name: topology
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologies
+    oas_schema: com.nokia.eda.topologies.v1.Topology
+  - model_name: topology_grouping
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/topologygroupings
+    oas_schema: com.nokia.eda.topologies.v1.TopologyGrouping
+  - model_name: traffic_rate_overlay
+    oas_endpoint: /apps/topologies.eda.nokia.com/v1/trafficrateoverlays
+    oas_schema: com.nokia.eda.topologies.v1.TrafficRateOverlay
+  - model_name: network_topology
+    oas_endpoint: /workflows/v1/topologies.eda.nokia.com/v1/namespaces/{namespace}/networktopologies
+    oas_schema: com.nokia.eda.topologies.v1.NetworkTopology
+
+qualified:
+  datasources:
+    - oas_schema: IntentTargets
+      get: /apps/topologies.eda.nokia.com/v1/alarmoverlays/{name}/_targets
+    - oas_schema: ResourceHistory
+      get: /apps/topologies.eda.nokia.com/v1/alarmoverlays/{name}/_revs
+    - oas_schema: UIResult
+      get: /apps/topologies.eda.nokia.com/v1/_ui/{pathname}
+    - oas_schema: com.nokia.eda.topologies.v1.AlarmOverlay_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/alarmoverlays/_deleted
+    - oas_schema: com.nokia.eda.topologies.v1.DeviationOverlay_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/deviationoverlays/_deleted
+    - oas_schema: com.nokia.eda.topologies.v1.LldpOverlay_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/lldpoverlays/_deleted
+    - oas_schema: com.nokia.eda.topologies.v1.TopologyGrouping_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/topologygroupings/_deleted
+    - oas_schema: com.nokia.eda.topologies.v1.Topology_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/topologies/_deleted
+    - oas_schema: com.nokia.eda.topologies.v1.TrafficRateOverlay_DeletedResources
+      get: /apps/topologies.eda.nokia.com/v1/trafficrateoverlays/_deleted
+  resources:
