@@ -97,22 +97,22 @@ func TopologyDataSourceSchema(ctx context.Context) schema.Schema {
 			"spec": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"enabled": schema.BoolAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "Enable or disable the generation of the status of this topology",
 						MarkdownDescription: "Enable or disable the generation of the status of this topology",
 					},
 					"endpoint_subtitle": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for endpoints in the topology",
 						MarkdownDescription: "Override the subtitle to show for endpoints in the topology",
 					},
 					"link_subtitle": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for links in the topology",
 						MarkdownDescription: "Override the subtitle to show for links in the topology",
 					},
 					"node_subtitle": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for nodes in the topology",
 						MarkdownDescription: "Override the subtitle to show for nodes in the topology",
 					},
@@ -120,12 +120,12 @@ func TopologyDataSourceSchema(ctx context.Context) schema.Schema {
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"enabled": schema.BoolAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "Enable or disable the generation of the status of this overlay",
 									MarkdownDescription: "Enable or disable the generation of the status of this overlay",
 								},
 								"key": schema.StringAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "A unique key for identifying this overlay within the topology.  This is used internally\nonly.",
 									MarkdownDescription: "A unique key for identifying this overlay within the topology.  This is used internally\nonly.",
 								},
@@ -136,27 +136,27 @@ func TopologyDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
-						Optional:            true,
+						Computed:            true,
 						Description:         "The set of overlays supported with this topology",
 						MarkdownDescription: "The set of overlays supported with this topology",
 					},
 					"ui_description": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "A description of the topology to expose in the UI",
 						MarkdownDescription: "A description of the topology to expose in the UI",
 					},
 					"ui_description_key": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the description of the topology to expose in the UI",
 						MarkdownDescription: "The translation key for the description of the topology to expose in the UI",
 					},
 					"ui_name": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The name of the topology to expose in the UI",
 						MarkdownDescription: "The name of the topology to expose in the UI",
 					},
 					"ui_name_key": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the name of the topology to expose in the UI",
 						MarkdownDescription: "The translation key for the name of the topology to expose in the UI",
 					},
@@ -166,7 +166,7 @@ func TopologyDataSourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: SpecValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
+				Computed:            true,
 				Description:         "TopologySpec defines the desired state of Topology",
 				MarkdownDescription: "TopologySpec defines the desired state of Topology",
 			},

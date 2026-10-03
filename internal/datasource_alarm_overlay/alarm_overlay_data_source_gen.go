@@ -97,24 +97,24 @@ func AlarmOverlayDataSourceSchema(ctx context.Context) schema.Schema {
 			"spec": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"enabled": schema.BoolAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "Enable or disable the generation of the status of this overlay",
 						MarkdownDescription: "Enable or disable the generation of the status of this overlay",
 					},
 					"topology": schema.SingleNestedAttribute{
 						Attributes: map[string]schema.Attribute{
 							"group": schema.StringAttribute{
-								Optional:            true,
+								Computed:            true,
 								Description:         "The group of the application which published the topology this overlay is extending.",
 								MarkdownDescription: "The group of the application which published the topology this overlay is extending.",
 							},
 							"name": schema.StringAttribute{
-								Optional:            true,
+								Computed:            true,
 								Description:         "The name of the resource which published the topology this overlay is extending.",
 								MarkdownDescription: "The name of the resource which published the topology this overlay is extending.",
 							},
 							"version": schema.StringAttribute{
-								Optional:            true,
+								Computed:            true,
 								Description:         "The version of the application which published the topology this overlay is extending.",
 								MarkdownDescription: "The version of the application which published the topology this overlay is extending.",
 							},
@@ -124,27 +124,27 @@ func AlarmOverlayDataSourceSchema(ctx context.Context) schema.Schema {
 								AttrTypes: TopologyValue{}.AttributeTypes(ctx),
 							},
 						},
-						Optional:            true,
+						Computed:            true,
 						Description:         "Reference to the topology that this overlay is extending.",
 						MarkdownDescription: "Reference to the topology that this overlay is extending.",
 					},
 					"ui_description": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "A description of the overlay to expose in the UI",
 						MarkdownDescription: "A description of the overlay to expose in the UI",
 					},
 					"ui_description_key": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the description of the overlay to expose in the UI",
 						MarkdownDescription: "The translation key for the description of the overlay to expose in the UI",
 					},
 					"ui_name": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The name of the overlay to expose in the UI",
 						MarkdownDescription: "The name of the overlay to expose in the UI",
 					},
 					"ui_name_key": schema.StringAttribute{
-						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the name of the overlay to expose in the UI",
 						MarkdownDescription: "The translation key for the name of the overlay to expose in the UI",
 					},
@@ -154,7 +154,7 @@ func AlarmOverlayDataSourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: SpecValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
+				Computed:            true,
 				Description:         "AlarmOverlaySpec defines the desired state of AlarmOverlay",
 				MarkdownDescription: "AlarmOverlaySpec defines the desired state of AlarmOverlay",
 			},

@@ -107,18 +107,18 @@ func TopologyGroupingListDataSourceSchema(ctx context.Context) schema.Schema {
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"group": schema.StringAttribute{
-												Optional:            true,
+												Computed:            true,
 												Description:         "The group to assign to nodes that match the selector.  Primarily this is used as a unique\nkey to identify which nodes share the same group key and should be put together.",
 												MarkdownDescription: "The group to assign to nodes that match the selector.  Primarily this is used as a unique\nkey to identify which nodes share the same group key and should be put together.",
 											},
 											"group_ui_name": schema.StringAttribute{
-												Optional:            true,
+												Computed:            true,
 												Description:         "The name of the group to show in the UI.  If not set, then the UI will display the group\nstring above.",
 												MarkdownDescription: "The name of the group to show in the UI.  If not set, then the UI will display the group\nstring above.",
 											},
 											"node_selector": schema.ListAttribute{
 												ElementType:         types.StringType,
-												Optional:            true,
+												Computed:            true,
 												Description:         "Label selector to use to match nodes that should be assigned to this group.",
 												MarkdownDescription: "Label selector to use to match nodes that should be assigned to this group.",
 											},
@@ -129,7 +129,7 @@ func TopologyGroupingListDataSourceSchema(ctx context.Context) schema.Schema {
 											},
 										},
 									},
-									Optional:            true,
+									Computed:            true,
 									Description:         "The set of selectors for assigning nodes to groups",
 									MarkdownDescription: "The set of selectors for assigning nodes to groups",
 								},
@@ -138,12 +138,12 @@ func TopologyGroupingListDataSourceSchema(ctx context.Context) schema.Schema {
 										Attributes: map[string]schema.Attribute{
 											"node_selector": schema.ListAttribute{
 												ElementType:         types.StringType,
-												Optional:            true,
+												Computed:            true,
 												Description:         "Label selector to use to match nodes that should be assigned to this tier.",
 												MarkdownDescription: "Label selector to use to match nodes that should be assigned to this tier.",
 											},
 											"tier": schema.Int64Attribute{
-												Optional:            true,
+												Computed:            true,
 												Description:         "The tier to assign to nodes that match the selector.",
 												MarkdownDescription: "The tier to assign to nodes that match the selector.",
 											},
@@ -154,27 +154,27 @@ func TopologyGroupingListDataSourceSchema(ctx context.Context) schema.Schema {
 											},
 										},
 									},
-									Optional:            true,
+									Computed:            true,
 									Description:         "The set of selectors for assigning nodes to tiers",
 									MarkdownDescription: "The set of selectors for assigning nodes to tiers",
 								},
 								"ui_description": schema.StringAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "A description of the topology grouping to expose in the UI",
 									MarkdownDescription: "A description of the topology grouping to expose in the UI",
 								},
 								"ui_description_key": schema.StringAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "The translation key for the description of the topology grouping to expose in the UI",
 									MarkdownDescription: "The translation key for the description of the topology grouping to expose in the UI",
 								},
 								"ui_name": schema.StringAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "The name of the topology grouping to expose in the UI",
 									MarkdownDescription: "The name of the topology grouping to expose in the UI",
 								},
 								"ui_name_key": schema.StringAttribute{
-									Optional:            true,
+									Computed:            true,
 									Description:         "The translation key for the name of the topology grouping to expose in the UI",
 									MarkdownDescription: "The translation key for the name of the topology grouping to expose in the UI",
 								},
@@ -184,7 +184,7 @@ func TopologyGroupingListDataSourceSchema(ctx context.Context) schema.Schema {
 									AttrTypes: SpecValue{}.AttributeTypes(ctx),
 								},
 							},
-							Optional:            true,
+							Computed:            true,
 							Description:         "TopologyGroupingSpec defines the desired state of TopologyGrouping",
 							MarkdownDescription: "TopologyGroupingSpec defines the desired state of TopologyGrouping",
 						},

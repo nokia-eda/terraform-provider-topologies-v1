@@ -31,10 +31,6 @@ description: |-
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `spec` (Attributes) TopologySpec defines the desired state of Topology (see [below for nested schema](#nestedatt--items--spec))
-
 Read-Only:
 
 - `alarms` (Attributes) (see [below for nested schema](#nestedatt--items--alarms))
@@ -42,33 +38,8 @@ Read-Only:
 - `deviations` (Attributes) (see [below for nested schema](#nestedatt--items--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--items--metadata))
+- `spec` (Attributes) TopologySpec defines the desired state of Topology (see [below for nested schema](#nestedatt--items--spec))
 - `status` (Attributes) TopologyStatus defines the observed state of Topology (see [below for nested schema](#nestedatt--items--status))
-
-<a id="nestedatt--items--spec"></a>
-### Nested Schema for `items.spec`
-
-Optional:
-
-- `enabled` (Boolean) Enable or disable the generation of the status of this topology
-- `endpoint_subtitle` (String) Override the subtitle to show for endpoints in the topology
-- `link_subtitle` (String) Override the subtitle to show for links in the topology
-- `node_subtitle` (String) Override the subtitle to show for nodes in the topology
-- `overlays` (Attributes List) The set of overlays supported with this topology (see [below for nested schema](#nestedatt--items--spec--overlays))
-- `ui_description` (String) A description of the topology to expose in the UI
-- `ui_description_key` (String) The translation key for the description of the topology to expose in the UI
-- `ui_name` (String) The name of the topology to expose in the UI
-- `ui_name_key` (String) The translation key for the name of the topology to expose in the UI
-
-<a id="nestedatt--items--spec--overlays"></a>
-### Nested Schema for `items.spec.overlays`
-
-Optional:
-
-- `enabled` (Boolean) Enable or disable the generation of the status of this overlay
-- `key` (String) A unique key for identifying this overlay within the topology.  This is used internally
-only.
-
-
 
 <a id="nestedatt--items--alarms"></a>
 ### Nested Schema for `items.alarms`
@@ -98,6 +69,32 @@ Read-Only:
 - `labels` (Map of String)
 - `name` (String)
 - `namespace` (String)
+
+
+<a id="nestedatt--items--spec"></a>
+### Nested Schema for `items.spec`
+
+Read-Only:
+
+- `enabled` (Boolean) Enable or disable the generation of the status of this topology
+- `endpoint_subtitle` (String) Override the subtitle to show for endpoints in the topology
+- `link_subtitle` (String) Override the subtitle to show for links in the topology
+- `node_subtitle` (String) Override the subtitle to show for nodes in the topology
+- `overlays` (Attributes List) The set of overlays supported with this topology (see [below for nested schema](#nestedatt--items--spec--overlays))
+- `ui_description` (String) A description of the topology to expose in the UI
+- `ui_description_key` (String) The translation key for the description of the topology to expose in the UI
+- `ui_name` (String) The name of the topology to expose in the UI
+- `ui_name_key` (String) The translation key for the name of the topology to expose in the UI
+
+<a id="nestedatt--items--spec--overlays"></a>
+### Nested Schema for `items.spec.overlays`
+
+Read-Only:
+
+- `enabled` (Boolean) Enable or disable the generation of the status of this overlay
+- `key` (String) A unique key for identifying this overlay within the topology.  This is used internally
+only.
+
 
 
 <a id="nestedatt--items--status"></a>

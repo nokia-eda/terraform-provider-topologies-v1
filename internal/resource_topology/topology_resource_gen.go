@@ -127,16 +127,19 @@ func TopologyResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"endpoint_subtitle": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for endpoints in the topology",
 						MarkdownDescription: "Override the subtitle to show for endpoints in the topology",
 					},
 					"link_subtitle": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for links in the topology",
 						MarkdownDescription: "Override the subtitle to show for links in the topology",
 					},
 					"node_subtitle": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "Override the subtitle to show for nodes in the topology",
 						MarkdownDescription: "Override the subtitle to show for nodes in the topology",
 					},
@@ -166,21 +169,25 @@ func TopologyResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"ui_description": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "A description of the topology to expose in the UI",
 						MarkdownDescription: "A description of the topology to expose in the UI",
 					},
 					"ui_description_key": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the description of the topology to expose in the UI",
 						MarkdownDescription: "The translation key for the description of the topology to expose in the UI",
 					},
 					"ui_name": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "The name of the topology to expose in the UI",
 						MarkdownDescription: "The name of the topology to expose in the UI",
 					},
 					"ui_name_key": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "The translation key for the name of the topology to expose in the UI",
 						MarkdownDescription: "The translation key for the name of the topology to expose in the UI",
 					},

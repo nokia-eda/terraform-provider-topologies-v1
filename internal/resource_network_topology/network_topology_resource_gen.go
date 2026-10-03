@@ -139,6 +139,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							"prompts": schema.ListAttribute{
 								ElementType:         types.StringType,
 								Optional:            true,
+								Computed:            true,
 								Description:         "Prompts can be configured to request user confirmation before creating, replacing, or deleting topology resources, regardless if Dry Run is enabled or not.\nThis can be configured per operation type (BeforeCreate, BeforeReplace, BeforeDelete).",
 								MarkdownDescription: "Prompts can be configured to request user confirmation before creating, replacing, or deleting topology resources, regardless if Dry Run is enabled or not.\nThis can be configured per operation type (BeforeCreate, BeforeReplace, BeforeDelete).",
 							},
@@ -149,8 +150,38 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Configure dry run mode and prompts for topology operations.",
 						MarkdownDescription: "Configure dry run mode and prompts for topology operations.",
+					},
+					"hmac_secret_ref": schema.SingleNestedAttribute{
+						Attributes: map[string]schema.Attribute{
+							"key": schema.StringAttribute{
+								Required:            true,
+								Description:         "Key within the Secret's data map.",
+								MarkdownDescription: "Key within the Secret's data map.",
+							},
+							"name": schema.StringAttribute{
+								Required:            true,
+								Description:         "Name of the Secret.",
+								MarkdownDescription: "Name of the Secret.",
+							},
+							"namespace": schema.StringAttribute{
+								Optional:            true,
+								Computed:            true,
+								Description:         "Namespace of the Secret. If not provided, the Secret is assumed to be in the same namespace as the Topology.",
+								MarkdownDescription: "Namespace of the Secret. If not provided, the Secret is assumed to be in the same namespace as the Topology.",
+							},
+						},
+						CustomType: HmacSecretRefType{
+							ObjectType: types.ObjectType{
+								AttrTypes: HmacSecretRefValue{}.AttributeTypes(ctx),
+							},
+						},
+						Optional:            true,
+						Computed:            true,
+						Description:         "HMACSecretRef references a Kubernetes Secret containing the HMAC key the server\nuses to validate request signatures from the caller. When set, the server rejects\nany request whose signature does not match.",
+						MarkdownDescription: "HMACSecretRef references a Kubernetes Secret containing the HMAC key the server\nuses to validate request signatures from the caller. When set, the server rejects\nany request whose signature does not match.",
 					},
 					"link_templates": schema.ListNestedAttribute{
 						NestedObject: schema.NestedAttributeObject{
@@ -158,6 +189,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"annotations": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Annotations to assign to the TopoLink.",
 									MarkdownDescription: "Annotations to assign to the TopoLink.",
 								},
@@ -168,6 +200,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 												Attributes: map[string]schema.Attribute{
 													"channels": schema.Int64Attribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "The number of breakout channels to create",
 														MarkdownDescription: "The number of breakout channels to create",
 														Validators: []validator.Int64{
@@ -176,6 +209,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 													"speed": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Speed of each breakout channel",
 														MarkdownDescription: "Speed of each breakout channel",
 														Validators: []validator.String{
@@ -201,6 +235,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Local breakout endpoint properties",
 												MarkdownDescription: "Local breakout endpoint properties",
 											},
@@ -208,6 +243,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 												Attributes: map[string]schema.Attribute{
 													"channels": schema.Int64Attribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "The number of breakout channels to create",
 														MarkdownDescription: "The number of breakout channels to create",
 														Validators: []validator.Int64{
@@ -216,6 +252,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 													"speed": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Speed of each breakout channel",
 														MarkdownDescription: "Speed of each breakout channel",
 														Validators: []validator.String{
@@ -241,6 +278,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Remote breakout endpoint properties",
 												MarkdownDescription: "Remote breakout endpoint properties",
 											},
@@ -252,6 +290,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "Breakout endpoints propertiesfor the link",
 									MarkdownDescription: "Breakout endpoints propertiesfor the link",
 								},
@@ -271,6 +310,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"labels": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Labels to assign to the TopoLink.",
 									MarkdownDescription: "Labels to assign to the TopoLink.",
 								},
@@ -281,6 +321,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"speed": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Speed of the link.",
 									MarkdownDescription: "Speed of the link.",
 									Validators: []validator.String{
@@ -301,12 +342,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"type": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Specify the type of link.\nIf type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.",
 									MarkdownDescription: "Specify the type of link.\nIf type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.",
 									Validators: []validator.String{
 										stringvalidator.OneOf(
-											"Edge",
 											"InterSwitch",
+											"Edge",
 											"Loopback",
 										),
 									},
@@ -319,6 +361,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Define the link parameters that are meant to be inherited by the topology links referencing the template. These parameters can be overridden at the link level.",
 						MarkdownDescription: "Define the link parameters that are meant to be inherited by the topology links referencing the template. These parameters can be overridden at the link level.",
 					},
@@ -328,11 +371,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"annotations": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Annotations to assign to the TopoLink.",
 									MarkdownDescription: "Annotations to assign to the TopoLink.",
 								},
 								"encap_type": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Enable or disable VLAN tagging on Interfaces created by the TopoLink",
 									MarkdownDescription: "Enable or disable VLAN tagging on Interfaces created by the TopoLink",
 									Validators: []validator.String{
@@ -349,11 +394,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 												Attributes: map[string]schema.Attribute{
 													"interface": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Normalized name of the interface/port, e.g. ethernet-1-1.",
 														MarkdownDescription: "Normalized name of the interface/port, e.g. ethernet-1-1.",
 													},
 													"interface_resource": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Reference to a Interface.",
 														MarkdownDescription: "Reference to a Interface.",
 													},
@@ -376,11 +423,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 												Attributes: map[string]schema.Attribute{
 													"interface": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Normalized name of the interface/port, e.g. ethernet-1-1.",
 														MarkdownDescription: "Normalized name of the interface/port, e.g. ethernet-1-1.",
 													},
 													"interface_resource": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "Reference to a Interface.",
 														MarkdownDescription: "Reference to a Interface.",
 													},
@@ -396,6 +445,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Remote, or \"B\" endpoint of the link.",
 												MarkdownDescription: "Remote, or \"B\" endpoint of the link.",
 											},
@@ -403,11 +453,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 												Attributes: map[string]schema.Attribute{
 													"sim_node": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.",
 														MarkdownDescription: "The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.",
 													},
 													"sim_node_interface": schema.StringAttribute{
 														Optional:            true,
+														Computed:            true,
 														Description:         "The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with \"eth1\", \"eth2\", ... .\nThis is the interface name as it will appear in the SimNode.",
 														MarkdownDescription: "The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with \"eth1\", \"eth2\", ... .\nThis is the interface name as it will appear in the SimNode.",
 													},
@@ -418,11 +470,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Sim endpoint of the link.",
 												MarkdownDescription: "Sim endpoint of the link.",
 											},
 											"speed": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Speed of the link.",
 												MarkdownDescription: "Speed of the link.",
 												Validators: []validator.String{
@@ -443,12 +497,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"type": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Specify the type of link.\nIf type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.",
 												MarkdownDescription: "Specify the type of link.\nIf type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.",
 												Validators: []validator.String{
 													stringvalidator.OneOf(
-														"Edge",
 														"InterSwitch",
+														"Edge",
 														"Loopback",
 													),
 												},
@@ -470,6 +525,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"labels": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Labels to assign to the TopoLink",
 									MarkdownDescription: "Labels to assign to the TopoLink",
 								},
@@ -480,6 +536,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"template": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a template to use for this TopoLink.",
 									MarkdownDescription: "Reference to a template to use for this TopoLink.",
 								},
@@ -491,6 +548,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Define the set of topology links to be created/replaced/deleted. A link can reference a link template to inherit its parameters.",
 						MarkdownDescription: "Define the set of topology links to be created/replaced/deleted. A link can reference a link template to inherit its parameters.",
 					},
@@ -500,6 +558,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"annotations": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Annotations to assign to the TopoNode.",
 									MarkdownDescription: "Annotations to assign to the TopoNode.",
 								},
@@ -525,6 +584,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"slot": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 												MarkdownDescription: "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 											},
@@ -541,17 +601,20 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "List of components within the TopoNode.\nUsed to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM).",
 									MarkdownDescription: "List of components within the TopoNode.\nUsed to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM).",
 								},
 								"labels": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Labels to assign to the TopoNode.",
 									MarkdownDescription: "Labels to assign to the TopoNode.",
 								},
 								"license": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.",
 									MarkdownDescription: "Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.",
 								},
@@ -562,11 +625,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"node_profile": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a NodeProfile to use with this TopoNode.",
 									MarkdownDescription: "Reference to a NodeProfile to use with this TopoNode.",
 								},
 								"platform": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Platform type of this TopoNode, e.g. 7220 IXR-D3L.",
 									MarkdownDescription: "Platform type of this TopoNode, e.g. 7220 IXR-D3L.",
 								},
@@ -595,6 +660,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 														},
 														"slot": schema.StringAttribute{
 															Optional:            true,
+															Computed:            true,
 															Description:         "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 															MarkdownDescription: "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 														},
@@ -611,6 +677,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Components for the satellite node.",
 												MarkdownDescription: "Components for the satellite node.",
 											},
@@ -621,21 +688,25 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"mac_address": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         " MAC Address of the satellite node.",
 												MarkdownDescription: " MAC Address of the satellite node.",
 											},
 											"platform": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Platform of the satellite node.",
 												MarkdownDescription: "Platform of the satellite node.",
 											},
 											"port_template": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Port template to be used for the satellite node.",
 												MarkdownDescription: "Port template to be used for the satellite node.",
 											},
 											"satellite_profile": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Satellite profile to be used for the satellite node.",
 												MarkdownDescription: "Satellite profile to be used for the satellite node.",
 											},
@@ -665,6 +736,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Uplink interfaces to be created for the satellite node.",
 												MarkdownDescription: "Uplink interfaces to be created for the satellite node.",
 											},
@@ -676,6 +748,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "List of satellite nodes to be inherited by nodes using this template.",
 									MarkdownDescription: "List of satellite nodes to be inherited by nodes using this template.",
 								},
@@ -687,6 +760,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Define the node parameters that are meant to be inherited by the topology nodes referencing the template. These parameters can be overridden at the node level.",
 						MarkdownDescription: "Define the node parameters that are meant to be inherited by the topology nodes referencing the template. These parameters can be overridden at the node level.",
 					},
@@ -696,6 +770,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								"annotations": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Annotations to assign to the TopoNode.",
 									MarkdownDescription: "Annotations to assign to the TopoNode.",
 								},
@@ -721,6 +796,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"slot": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 												MarkdownDescription: "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 											},
@@ -737,22 +813,26 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "List of components within the TopoNode.\nUsed to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM).",
 									MarkdownDescription: "List of components within the TopoNode.\nUsed to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM).",
 								},
 								"labels": schema.MapAttribute{
 									ElementType:         types.StringType,
 									Optional:            true,
+									Computed:            true,
 									Description:         "Labels to assign to the TopoNode",
 									MarkdownDescription: "Labels to assign to the TopoNode",
 								},
 								"license": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.",
 									MarkdownDescription: "Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.",
 								},
 								"mac_address": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "MAC address to associate with this TopoNode.\nTypically the chassis MAC address, optionally sent by a node in DHCP requests.\nNot required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.",
 									MarkdownDescription: "MAC address to associate with this TopoNode.\nTypically the chassis MAC address, optionally sent by a node in DHCP requests.\nNot required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.",
 								},
@@ -763,6 +843,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"node_profile": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a NodeProfile to use with this TopoNode.",
 									MarkdownDescription: "Reference to a NodeProfile to use with this TopoNode.",
 								},
@@ -791,6 +872,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "Options relating to NPP interactions with the node.",
 									MarkdownDescription: "Options relating to NPP interactions with the node.",
 								},
@@ -803,6 +885,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"operating_system": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Operating system running on this TopoNode, e.g. srl.",
 									MarkdownDescription: "Operating system running on this TopoNode, e.g. srl.",
 									Validators: []validator.String{
@@ -813,11 +896,14 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											"sonic",
 											"ios-xr",
 											"nxos",
+											"junos",
+											"cumulus",
 										),
 									},
 								},
 								"platform": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Platform type of this TopoNode, e.g. 7220 IXR-D3L.",
 									MarkdownDescription: "Platform type of this TopoNode, e.g. 7220 IXR-D3L.",
 								},
@@ -825,11 +911,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 									Attributes: map[string]schema.Attribute{
 										"ipv4": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "The IPv4 production address",
 											MarkdownDescription: "The IPv4 production address",
 										},
 										"ipv6": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "The IPv6 production address",
 											MarkdownDescription: "The IPv6 production address",
 										},
@@ -840,6 +928,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "Production address of this TopoNode - this is the address the real, production instance of this TopoNode uses.\nIf left blank, an address will be allocated from the management IP pool specified in the referenced NodeProfile.\nIf this TopoNode is not bootstrapped by EDA this field must be provided.",
 									MarkdownDescription: "Production address of this TopoNode - this is the address the real, production instance of this TopoNode uses.\nIf left blank, an address will be allocated from the management IP pool specified in the referenced NodeProfile.\nIf this TopoNode is not bootstrapped by EDA this field must be provided.",
 								},
@@ -868,6 +957,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 														},
 														"slot": schema.StringAttribute{
 															Optional:            true,
+															Computed:            true,
 															Description:         "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 															MarkdownDescription: "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 														},
@@ -884,6 +974,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Components for the satellite node.",
 												MarkdownDescription: "Components for the satellite node.",
 											},
@@ -894,21 +985,25 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"mac_address": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         " MAC Address of the satellite node.",
 												MarkdownDescription: " MAC Address of the satellite node.",
 											},
 											"platform": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Platform of the satellite node.",
 												MarkdownDescription: "Platform of the satellite node.",
 											},
 											"port_template": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Port template to be used for the satellite node.",
 												MarkdownDescription: "Port template to be used for the satellite node.",
 											},
 											"satellite_profile": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "Satellite profile to be used for the satellite node.",
 												MarkdownDescription: "Satellite profile to be used for the satellite node.",
 											},
@@ -938,6 +1033,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 													},
 												},
 												Optional:            true,
+												Computed:            true,
 												Description:         "Uplink interfaces to be created for the satellite node.",
 												MarkdownDescription: "Uplink interfaces to be created for the satellite node.",
 											},
@@ -949,26 +1045,31 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "List of satellite nodes to be inherited by this TopoNode.",
 									MarkdownDescription: "List of satellite nodes to be inherited by this TopoNode.",
 								},
 								"serial_number": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Serial number of this TopoNode, optionally sent by a node in DHCP requests.\nNot required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.",
 									MarkdownDescription: "Serial number of this TopoNode, optionally sent by a node in DHCP requests.\nNot required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.",
 								},
 								"system_interface": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Deprecated: Name of the Interface resource representing the primary loopback on the TopoNode, this field will be removed in the future version.",
 									MarkdownDescription: "Deprecated: Name of the Interface resource representing the primary loopback on the TopoNode, this field will be removed in the future version.",
 								},
 								"template": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Reference to a template to use for this TopoNode.",
 									MarkdownDescription: "Reference to a template to use for this TopoNode.",
 								},
 								"version": schema.StringAttribute{
 									Optional:            true,
+									Computed:            true,
 									Description:         "Sets the software version of this TopoNode, e.g. 24.7.1 (for srl), or 24.7.r1 (for sros).",
 									MarkdownDescription: "Sets the software version of this TopoNode, e.g. 24.7.1 (for srl), or 24.7.r1 (for sros).",
 								},
@@ -980,6 +1081,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Define the set of topology nodes to be created/replaced/deleted. A node can reference a node template to inherit its parameters.",
 						MarkdownDescription: "Define the set of topology nodes to be created/replaced/deleted. A node can reference a node template to inherit its parameters.",
 					},
@@ -1002,6 +1104,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"remote_location": schema.StringAttribute{
 						Optional:            true,
+						Computed:            true,
 						Description:         "http(s) location of the topology input in YAML format to deploy. Providing the remote location will discard any topology resources provided in the spec of the workflow.",
 						MarkdownDescription: "http(s) location of the topology input in YAML format to deploy. Providing the remote location will discard any topology resources provided in the spec of the workflow.",
 					},
@@ -1030,6 +1133,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"slot": schema.StringAttribute{
 												Optional:            true,
+												Computed:            true,
 												Description:         "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 												MarkdownDescription: "The slot this Component resides in, unset for Components that do not have a slot or ID.\ne.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.",
 											},
@@ -1046,6 +1150,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "List of connector components within the SatellitePortTemplate.\nUsed to define the type and location of connectors.",
 									MarkdownDescription: "List of connector components within the SatellitePortTemplate.\nUsed to define the type and location of connectors.",
 								},
@@ -1060,6 +1165,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 											"downlinks": schema.ListAttribute{
 												ElementType:         types.StringType,
 												Optional:            true,
+												Computed:            true,
 												Description:         "Downlinks for the SatelliteUplink.",
 												MarkdownDescription: "Downlinks for the SatelliteUplink.",
 											},
@@ -1076,6 +1182,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 									Optional:            true,
+									Computed:            true,
 									Description:         "Uplinks for the SatellitePortTemplate.",
 									MarkdownDescription: "Uplinks for the SatellitePortTemplate.",
 								},
@@ -1087,6 +1194,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Define the satellite port templates that are meant to be inherited by the satellite nodes referencing the template. These parameters can be overridden at the satellite node level.",
 						MarkdownDescription: "Define the satellite port templates that are meant to be inherited by the satellite nodes referencing the template. These parameters can be overridden at the satellite node level.",
 					},
@@ -1098,22 +1206,26 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										"annotations": schema.MapAttribute{
 											ElementType:         types.StringType,
 											Optional:            true,
+											Computed:            true,
 											Description:         "Annotations to assign to the SimNode.",
 											MarkdownDescription: "Annotations to assign to the SimNode.",
 										},
 										"image": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.",
 											MarkdownDescription: "The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.",
 										},
 										"image_pull_secret": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "Reference to a Secret to use when pulling the image for this simNode.",
 											MarkdownDescription: "Reference to a Secret to use when pulling the image for this simNode.",
 										},
 										"labels": schema.MapAttribute{
 											ElementType:         types.StringType,
 											Optional:            true,
+											Computed:            true,
 											Description:         "Labels to assign to the SimNode.",
 											MarkdownDescription: "Labels to assign to the SimNode.",
 										},
@@ -1124,6 +1236,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 										"type": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "Type defines what is type of this SimNode.",
 											MarkdownDescription: "Type defines what is type of this SimNode.",
 											Validators: []validator.String{
@@ -1142,6 +1255,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								Optional:            true,
+								Computed:            true,
 								Description:         "Define the simulation node (sim node) parameters that are meant to be inherited by the simulation nodes referencing the template. These parameters can be overridden at the sim node level.",
 								MarkdownDescription: "Define the simulation node (sim node) parameters that are meant to be inherited by the simulation nodes referencing the template. These parameters can be overridden at the sim node level.",
 							},
@@ -1151,22 +1265,26 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										"annotations": schema.MapAttribute{
 											ElementType:         types.StringType,
 											Optional:            true,
+											Computed:            true,
 											Description:         "Annotations to assign to the SimNode.",
 											MarkdownDescription: "Annotations to assign to the SimNode.",
 										},
 										"image": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.",
 											MarkdownDescription: "The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.",
 										},
 										"image_pull_secret": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "Reference to a Secret to use when pulling the image for this simNode",
 											MarkdownDescription: "Reference to a Secret to use when pulling the image for this simNode",
 										},
 										"labels": schema.MapAttribute{
 											ElementType:         types.StringType,
 											Optional:            true,
+											Computed:            true,
 											Description:         "Labels to assign to the SimNode.",
 											MarkdownDescription: "Labels to assign to the SimNode.",
 										},
@@ -1177,11 +1295,13 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 										"template": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "Reference to a template to use for this SimNode.",
 											MarkdownDescription: "Reference to a template to use for this SimNode.",
 										},
 										"type": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "Type defines what is type of this SimNode",
 											MarkdownDescription: "Type defines what is type of this SimNode",
 											Validators: []validator.String{
@@ -1200,6 +1320,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								Optional:            true,
+								Computed:            true,
 								Description:         "Define the sim node to be created/replaced/deleted. A sim node can reference a sim node template to inherit its parameters.",
 								MarkdownDescription: "Define the sim node to be created/replaced/deleted. A sim node can reference a sim node template to inherit its parameters.",
 							},
@@ -1223,6 +1344,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 										},
 										"sim_node_interface": schema.StringAttribute{
 											Optional:            true,
+											Computed:            true,
 											Description:         "The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with \"eth1\", \"eth2\",...\nThis is the interface name as it will appear in the SimNode.",
 											MarkdownDescription: "The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with \"eth1\", \"eth2\",...\nThis is the interface name as it will appear in the SimNode.",
 										},
@@ -1234,6 +1356,7 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								Optional:            true,
+								Computed:            true,
 								Description:         "Define the simulation topology to be created/replaced/deleted by providing the list of nodes/interfaces and their corresponding sim nodes/sim node interfaces.",
 								MarkdownDescription: "Define the simulation topology to be created/replaced/deleted by providing the list of nodes/interfaces and their corresponding sim nodes/sim node interfaces.",
 							},
@@ -1244,8 +1367,57 @@ func NetworkTopologyResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Optional:            true,
+						Computed:            true,
 						Description:         "Specify simulation topology configuration.",
 						MarkdownDescription: "Specify simulation topology configuration.",
+					},
+					"tls": schema.SingleNestedAttribute{
+						Attributes: map[string]schema.Attribute{
+							"ca_bundle_ref": schema.SingleNestedAttribute{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Required:            true,
+										Description:         "Key within the ConfigMap's data map.",
+										MarkdownDescription: "Key within the ConfigMap's data map.",
+									},
+									"name": schema.StringAttribute{
+										Required:            true,
+										Description:         "Name of the ConfigMap.",
+										MarkdownDescription: "Name of the ConfigMap.",
+									},
+									"namespace": schema.StringAttribute{
+										Optional:            true,
+										Computed:            true,
+										Description:         "Namespace of the ConfigMap. If not provided, the ConfigMap is assumed to\nbe in the same namespace as the Topology.",
+										MarkdownDescription: "Namespace of the ConfigMap. If not provided, the ConfigMap is assumed to\nbe in the same namespace as the Topology.",
+									},
+								},
+								CustomType: CaBundleRefType{
+									ObjectType: types.ObjectType{
+										AttrTypes: CaBundleRefValue{}.AttributeTypes(ctx),
+									},
+								},
+								Optional:            true,
+								Computed:            true,
+								Description:         "CABundleRef references a Kubernetes ConfigMap whose value under the\ngiven key is a PEM-encoded CA certificate bundle used to verify the\nremote server's TLS certificate. When set, EDA's internal trust bundle is replaced by the provided bundle,\nbut the internal client certificate is still presented for mutual TLS.",
+								MarkdownDescription: "CABundleRef references a Kubernetes ConfigMap whose value under the\ngiven key is a PEM-encoded CA certificate bundle used to verify the\nremote server's TLS certificate. When set, EDA's internal trust bundle is replaced by the provided bundle,\nbut the internal client certificate is still presented for mutual TLS.",
+							},
+							"skip_verify": schema.BoolAttribute{
+								Optional:            true,
+								Computed:            true,
+								Description:         "SkipVerify disables TLS certificate verification for the remote server.\nIntended for non-production environments only.",
+								MarkdownDescription: "SkipVerify disables TLS certificate verification for the remote server.\nIntended for non-production environments only.",
+							},
+						},
+						CustomType: TlsType{
+							ObjectType: types.ObjectType{
+								AttrTypes: TlsValue{}.AttributeTypes(ctx),
+							},
+						},
+						Optional:            true,
+						Computed:            true,
+						Description:         "TLS configures optional TLS settings when connecting to an external HTTPS\nserver via remoteLocation. When omitted, EDA's internal TLS bundle is used.",
+						MarkdownDescription: "TLS configures optional TLS settings when connecting to an external HTTPS\nserver via remoteLocation. When omitted, EDA's internal TLS bundle is used.",
 					},
 				},
 				CustomType: SpecType{
@@ -2919,6 +3091,24 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 			fmt.Sprintf(`checks expected to be basetypes.ObjectValue, was: %T`, checksAttribute))
 	}
 
+	hmacSecretRefAttribute, ok := attributes["hmac_secret_ref"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`hmac_secret_ref is missing from object`)
+
+		return nil, diags
+	}
+
+	hmacSecretRefVal, ok := hmacSecretRefAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`hmac_secret_ref expected to be basetypes.ObjectValue, was: %T`, hmacSecretRefAttribute))
+	}
+
 	linkTemplatesAttribute, ok := attributes["link_templates"]
 
 	if !ok {
@@ -3063,12 +3253,31 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 			fmt.Sprintf(`simulation expected to be basetypes.ObjectValue, was: %T`, simulationAttribute))
 	}
 
+	tlsAttribute, ok := attributes["tls"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`tls is missing from object`)
+
+		return nil, diags
+	}
+
+	tlsVal, ok := tlsAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`tls expected to be basetypes.ObjectValue, was: %T`, tlsAttribute))
+	}
+
 	if diags.HasError() {
 		return nil, diags
 	}
 
 	return SpecValue{
 		Checks:                 checksVal,
+		HmacSecretRef:          hmacSecretRefVal,
 		LinkTemplates:          linkTemplatesVal,
 		Links:                  linksVal,
 		NodeTemplates:          nodeTemplatesVal,
@@ -3077,6 +3286,7 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 		RemoteLocation:         remoteLocationVal,
 		SatellitePortTemplates: satellitePortTemplatesVal,
 		Simulation:             simulationVal,
+		Tls:                    tlsVal,
 		state:                  attr.ValueStateKnown,
 	}, diags
 }
@@ -3162,6 +3372,24 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 			fmt.Sprintf(`checks expected to be basetypes.ObjectValue, was: %T`, checksAttribute))
 	}
 
+	hmacSecretRefAttribute, ok := attributes["hmac_secret_ref"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`hmac_secret_ref is missing from object`)
+
+		return NewSpecValueUnknown(), diags
+	}
+
+	hmacSecretRefVal, ok := hmacSecretRefAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`hmac_secret_ref expected to be basetypes.ObjectValue, was: %T`, hmacSecretRefAttribute))
+	}
+
 	linkTemplatesAttribute, ok := attributes["link_templates"]
 
 	if !ok {
@@ -3306,12 +3534,31 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 			fmt.Sprintf(`simulation expected to be basetypes.ObjectValue, was: %T`, simulationAttribute))
 	}
 
+	tlsAttribute, ok := attributes["tls"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`tls is missing from object`)
+
+		return NewSpecValueUnknown(), diags
+	}
+
+	tlsVal, ok := tlsAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`tls expected to be basetypes.ObjectValue, was: %T`, tlsAttribute))
+	}
+
 	if diags.HasError() {
 		return NewSpecValueUnknown(), diags
 	}
 
 	return SpecValue{
 		Checks:                 checksVal,
+		HmacSecretRef:          hmacSecretRefVal,
 		LinkTemplates:          linkTemplatesVal,
 		Links:                  linksVal,
 		NodeTemplates:          nodeTemplatesVal,
@@ -3320,6 +3567,7 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 		RemoteLocation:         remoteLocationVal,
 		SatellitePortTemplates: satellitePortTemplatesVal,
 		Simulation:             simulationVal,
+		Tls:                    tlsVal,
 		state:                  attr.ValueStateKnown,
 	}, diags
 }
@@ -3393,6 +3641,7 @@ var _ basetypes.ObjectValuable = SpecValue{}
 
 type SpecValue struct {
 	Checks                 basetypes.ObjectValue `tfsdk:"checks"`
+	HmacSecretRef          basetypes.ObjectValue `tfsdk:"hmac_secret_ref"`
 	LinkTemplates          basetypes.ListValue   `tfsdk:"link_templates"`
 	Links                  basetypes.ListValue   `tfsdk:"links"`
 	NodeTemplates          basetypes.ListValue   `tfsdk:"node_templates"`
@@ -3401,17 +3650,21 @@ type SpecValue struct {
 	RemoteLocation         basetypes.StringValue `tfsdk:"remote_location"`
 	SatellitePortTemplates basetypes.ListValue   `tfsdk:"satellite_port_templates"`
 	Simulation             basetypes.ObjectValue `tfsdk:"simulation"`
+	Tls                    basetypes.ObjectValue `tfsdk:"tls"`
 	state                  attr.ValueState
 }
 
 func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 9)
+	attrTypes := make(map[string]tftypes.Type, 11)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["checks"] = basetypes.ObjectType{
 		AttrTypes: ChecksValue{}.AttributeTypes(ctx),
+	}.TerraformType(ctx)
+	attrTypes["hmac_secret_ref"] = basetypes.ObjectType{
+		AttrTypes: HmacSecretRefValue{}.AttributeTypes(ctx),
 	}.TerraformType(ctx)
 	attrTypes["link_templates"] = basetypes.ListType{
 		ElemType: LinkTemplatesValue{}.Type(ctx),
@@ -3433,12 +3686,15 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	attrTypes["simulation"] = basetypes.ObjectType{
 		AttrTypes: SimulationValue{}.AttributeTypes(ctx),
 	}.TerraformType(ctx)
+	attrTypes["tls"] = basetypes.ObjectType{
+		AttrTypes: TlsValue{}.AttributeTypes(ctx),
+	}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 9)
+		vals := make(map[string]tftypes.Value, 11)
 
 		val, err = v.Checks.ToTerraformValue(ctx)
 
@@ -3447,6 +3703,14 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		}
 
 		vals["checks"] = val
+
+		val, err = v.HmacSecretRef.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["hmac_secret_ref"] = val
 
 		val, err = v.LinkTemplates.ToTerraformValue(ctx)
 
@@ -3512,6 +3776,14 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 
 		vals["simulation"] = val
 
+		val, err = v.Tls.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["tls"] = val
+
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -3559,6 +3831,27 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		checks = types.ObjectValueMust(
 			ChecksValue{}.AttributeTypes(ctx),
 			v.Checks.Attributes(),
+		)
+	}
+
+	var hmacSecretRef basetypes.ObjectValue
+
+	if v.HmacSecretRef.IsNull() {
+		hmacSecretRef = types.ObjectNull(
+			HmacSecretRefValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if v.HmacSecretRef.IsUnknown() {
+		hmacSecretRef = types.ObjectUnknown(
+			HmacSecretRefValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if !v.HmacSecretRef.IsNull() && !v.HmacSecretRef.IsUnknown() {
+		hmacSecretRef = types.ObjectValueMust(
+			HmacSecretRefValue{}.AttributeTypes(ctx),
+			v.HmacSecretRef.Attributes(),
 		)
 	}
 
@@ -3728,9 +4021,33 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		)
 	}
 
+	var tls basetypes.ObjectValue
+
+	if v.Tls.IsNull() {
+		tls = types.ObjectNull(
+			TlsValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if v.Tls.IsUnknown() {
+		tls = types.ObjectUnknown(
+			TlsValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if !v.Tls.IsNull() && !v.Tls.IsUnknown() {
+		tls = types.ObjectValueMust(
+			TlsValue{}.AttributeTypes(ctx),
+			v.Tls.Attributes(),
+		)
+	}
+
 	attributeTypes := map[string]attr.Type{
 		"checks": basetypes.ObjectType{
 			AttrTypes: ChecksValue{}.AttributeTypes(ctx),
+		},
+		"hmac_secret_ref": basetypes.ObjectType{
+			AttrTypes: HmacSecretRefValue{}.AttributeTypes(ctx),
 		},
 		"link_templates": basetypes.ListType{
 			ElemType: LinkTemplatesValue{}.Type(ctx),
@@ -3752,6 +4069,9 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		"simulation": basetypes.ObjectType{
 			AttrTypes: SimulationValue{}.AttributeTypes(ctx),
 		},
+		"tls": basetypes.ObjectType{
+			AttrTypes: TlsValue{}.AttributeTypes(ctx),
+		},
 	}
 
 	if v.IsNull() {
@@ -3766,6 +4086,7 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		attributeTypes,
 		map[string]attr.Value{
 			"checks":                   checks,
+			"hmac_secret_ref":          hmacSecretRef,
 			"link_templates":           linkTemplates,
 			"links":                    links,
 			"node_templates":           nodeTemplates,
@@ -3774,6 +4095,7 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 			"remote_location":          v.RemoteLocation,
 			"satellite_port_templates": satellitePortTemplates,
 			"simulation":               simulation,
+			"tls":                      tls,
 		})
 
 	return objVal, diags
@@ -3795,6 +4117,10 @@ func (v SpecValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.Checks.Equal(other.Checks) {
+		return false
+	}
+
+	if !v.HmacSecretRef.Equal(other.HmacSecretRef) {
 		return false
 	}
 
@@ -3830,6 +4156,10 @@ func (v SpecValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.Tls.Equal(other.Tls) {
+		return false
+	}
+
 	return true
 }
 
@@ -3845,6 +4175,9 @@ func (v SpecValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"checks": basetypes.ObjectType{
 			AttrTypes: ChecksValue{}.AttributeTypes(ctx),
+		},
+		"hmac_secret_ref": basetypes.ObjectType{
+			AttrTypes: HmacSecretRefValue{}.AttributeTypes(ctx),
 		},
 		"link_templates": basetypes.ListType{
 			ElemType: LinkTemplatesValue{}.Type(ctx),
@@ -3865,6 +4198,9 @@ func (v SpecValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		},
 		"simulation": basetypes.ObjectType{
 			AttrTypes: SimulationValue{}.AttributeTypes(ctx),
+		},
+		"tls": basetypes.ObjectType{
+			AttrTypes: TlsValue{}.AttributeTypes(ctx),
 		},
 	}
 }
@@ -4272,6 +4608,440 @@ func (v ChecksValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"prompts": basetypes.ListType{
 			ElemType: types.StringType,
 		},
+	}
+}
+
+var _ basetypes.ObjectTypable = HmacSecretRefType{}
+
+type HmacSecretRefType struct {
+	basetypes.ObjectType
+}
+
+func (t HmacSecretRefType) Equal(o attr.Type) bool {
+	other, ok := o.(HmacSecretRefType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t HmacSecretRefType) String() string {
+	return "HmacSecretRefType"
+}
+
+func (t HmacSecretRefType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return nil, diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return nil, diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	namespaceAttribute, ok := attributes["namespace"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`namespace is missing from object`)
+
+		return nil, diags
+	}
+
+	namespaceVal, ok := namespaceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`namespace expected to be basetypes.StringValue, was: %T`, namespaceAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return HmacSecretRefValue{
+		Key:       keyVal,
+		Name:      nameVal,
+		Namespace: namespaceVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewHmacSecretRefValueNull() HmacSecretRefValue {
+	return HmacSecretRefValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewHmacSecretRefValueUnknown() HmacSecretRefValue {
+	return HmacSecretRefValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewHmacSecretRefValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (HmacSecretRefValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing HmacSecretRefValue Attribute Value",
+				"While creating a HmacSecretRefValue value, a missing attribute value was detected. "+
+					"A HmacSecretRefValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("HmacSecretRefValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid HmacSecretRefValue Attribute Type",
+				"While creating a HmacSecretRefValue value, an invalid attribute value was detected. "+
+					"A HmacSecretRefValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("HmacSecretRefValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("HmacSecretRefValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra HmacSecretRefValue Attribute Value",
+				"While creating a HmacSecretRefValue value, an extra attribute value was detected. "+
+					"A HmacSecretRefValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra HmacSecretRefValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewHmacSecretRefValueUnknown(), diags
+	}
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return NewHmacSecretRefValueUnknown(), diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return NewHmacSecretRefValueUnknown(), diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	namespaceAttribute, ok := attributes["namespace"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`namespace is missing from object`)
+
+		return NewHmacSecretRefValueUnknown(), diags
+	}
+
+	namespaceVal, ok := namespaceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`namespace expected to be basetypes.StringValue, was: %T`, namespaceAttribute))
+	}
+
+	if diags.HasError() {
+		return NewHmacSecretRefValueUnknown(), diags
+	}
+
+	return HmacSecretRefValue{
+		Key:       keyVal,
+		Name:      nameVal,
+		Namespace: namespaceVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewHmacSecretRefValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) HmacSecretRefValue {
+	object, diags := NewHmacSecretRefValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewHmacSecretRefValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t HmacSecretRefType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewHmacSecretRefValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewHmacSecretRefValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewHmacSecretRefValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewHmacSecretRefValueMust(HmacSecretRefValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t HmacSecretRefType) ValueType(ctx context.Context) attr.Value {
+	return HmacSecretRefValue{}
+}
+
+var _ basetypes.ObjectValuable = HmacSecretRefValue{}
+
+type HmacSecretRefValue struct {
+	Key       basetypes.StringValue `tfsdk:"key"`
+	Name      basetypes.StringValue `tfsdk:"name"`
+	Namespace basetypes.StringValue `tfsdk:"namespace"`
+	state     attr.ValueState
+}
+
+func (v HmacSecretRefValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 3)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["key"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["namespace"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 3)
+
+		val, err = v.Key.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["key"] = val
+
+		val, err = v.Name.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["name"] = val
+
+		val, err = v.Namespace.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["namespace"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v HmacSecretRefValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v HmacSecretRefValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v HmacSecretRefValue) String() string {
+	return "HmacSecretRefValue"
+}
+
+func (v HmacSecretRefValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"key":       basetypes.StringType{},
+		"name":      basetypes.StringType{},
+		"namespace": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"key":       v.Key,
+			"name":      v.Name,
+			"namespace": v.Namespace,
+		})
+
+	return objVal, diags
+}
+
+func (v HmacSecretRefValue) Equal(o attr.Value) bool {
+	other, ok := o.(HmacSecretRefValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Key.Equal(other.Key) {
+		return false
+	}
+
+	if !v.Name.Equal(other.Name) {
+		return false
+	}
+
+	if !v.Namespace.Equal(other.Namespace) {
+		return false
+	}
+
+	return true
+}
+
+func (v HmacSecretRefValue) Type(ctx context.Context) attr.Type {
+	return HmacSecretRefType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v HmacSecretRefValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"key":       basetypes.StringType{},
+		"name":      basetypes.StringType{},
+		"namespace": basetypes.StringType{},
 	}
 }
 
@@ -19603,6 +20373,846 @@ func (v TopologiesValue) AttributeTypes(ctx context.Context) map[string]attr.Typ
 		"node":               basetypes.StringType{},
 		"sim_node":           basetypes.StringType{},
 		"sim_node_interface": basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = TlsType{}
+
+type TlsType struct {
+	basetypes.ObjectType
+}
+
+func (t TlsType) Equal(o attr.Type) bool {
+	other, ok := o.(TlsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t TlsType) String() string {
+	return "TlsType"
+}
+
+func (t TlsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	caBundleRefAttribute, ok := attributes["ca_bundle_ref"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ca_bundle_ref is missing from object`)
+
+		return nil, diags
+	}
+
+	caBundleRefVal, ok := caBundleRefAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ca_bundle_ref expected to be basetypes.ObjectValue, was: %T`, caBundleRefAttribute))
+	}
+
+	skipVerifyAttribute, ok := attributes["skip_verify"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`skip_verify is missing from object`)
+
+		return nil, diags
+	}
+
+	skipVerifyVal, ok := skipVerifyAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`skip_verify expected to be basetypes.BoolValue, was: %T`, skipVerifyAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return TlsValue{
+		CaBundleRef: caBundleRefVal,
+		SkipVerify:  skipVerifyVal,
+		state:       attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTlsValueNull() TlsValue {
+	return TlsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewTlsValueUnknown() TlsValue {
+	return TlsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewTlsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (TlsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing TlsValue Attribute Value",
+				"While creating a TlsValue value, a missing attribute value was detected. "+
+					"A TlsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TlsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid TlsValue Attribute Type",
+				"While creating a TlsValue value, an invalid attribute value was detected. "+
+					"A TlsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TlsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("TlsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra TlsValue Attribute Value",
+				"While creating a TlsValue value, an extra attribute value was detected. "+
+					"A TlsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra TlsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewTlsValueUnknown(), diags
+	}
+
+	caBundleRefAttribute, ok := attributes["ca_bundle_ref"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ca_bundle_ref is missing from object`)
+
+		return NewTlsValueUnknown(), diags
+	}
+
+	caBundleRefVal, ok := caBundleRefAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ca_bundle_ref expected to be basetypes.ObjectValue, was: %T`, caBundleRefAttribute))
+	}
+
+	skipVerifyAttribute, ok := attributes["skip_verify"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`skip_verify is missing from object`)
+
+		return NewTlsValueUnknown(), diags
+	}
+
+	skipVerifyVal, ok := skipVerifyAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`skip_verify expected to be basetypes.BoolValue, was: %T`, skipVerifyAttribute))
+	}
+
+	if diags.HasError() {
+		return NewTlsValueUnknown(), diags
+	}
+
+	return TlsValue{
+		CaBundleRef: caBundleRefVal,
+		SkipVerify:  skipVerifyVal,
+		state:       attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTlsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) TlsValue {
+	object, diags := NewTlsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewTlsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t TlsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewTlsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewTlsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewTlsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewTlsValueMust(TlsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t TlsType) ValueType(ctx context.Context) attr.Value {
+	return TlsValue{}
+}
+
+var _ basetypes.ObjectValuable = TlsValue{}
+
+type TlsValue struct {
+	CaBundleRef basetypes.ObjectValue `tfsdk:"ca_bundle_ref"`
+	SkipVerify  basetypes.BoolValue   `tfsdk:"skip_verify"`
+	state       attr.ValueState
+}
+
+func (v TlsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["ca_bundle_ref"] = basetypes.ObjectType{
+		AttrTypes: CaBundleRefValue{}.AttributeTypes(ctx),
+	}.TerraformType(ctx)
+	attrTypes["skip_verify"] = basetypes.BoolType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.CaBundleRef.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["ca_bundle_ref"] = val
+
+		val, err = v.SkipVerify.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["skip_verify"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v TlsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v TlsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v TlsValue) String() string {
+	return "TlsValue"
+}
+
+func (v TlsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caBundleRef basetypes.ObjectValue
+
+	if v.CaBundleRef.IsNull() {
+		caBundleRef = types.ObjectNull(
+			CaBundleRefValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if v.CaBundleRef.IsUnknown() {
+		caBundleRef = types.ObjectUnknown(
+			CaBundleRefValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if !v.CaBundleRef.IsNull() && !v.CaBundleRef.IsUnknown() {
+		caBundleRef = types.ObjectValueMust(
+			CaBundleRefValue{}.AttributeTypes(ctx),
+			v.CaBundleRef.Attributes(),
+		)
+	}
+
+	attributeTypes := map[string]attr.Type{
+		"ca_bundle_ref": basetypes.ObjectType{
+			AttrTypes: CaBundleRefValue{}.AttributeTypes(ctx),
+		},
+		"skip_verify": basetypes.BoolType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"ca_bundle_ref": caBundleRef,
+			"skip_verify":   v.SkipVerify,
+		})
+
+	return objVal, diags
+}
+
+func (v TlsValue) Equal(o attr.Value) bool {
+	other, ok := o.(TlsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.CaBundleRef.Equal(other.CaBundleRef) {
+		return false
+	}
+
+	if !v.SkipVerify.Equal(other.SkipVerify) {
+		return false
+	}
+
+	return true
+}
+
+func (v TlsValue) Type(ctx context.Context) attr.Type {
+	return TlsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v TlsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"ca_bundle_ref": basetypes.ObjectType{
+			AttrTypes: CaBundleRefValue{}.AttributeTypes(ctx),
+		},
+		"skip_verify": basetypes.BoolType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = CaBundleRefType{}
+
+type CaBundleRefType struct {
+	basetypes.ObjectType
+}
+
+func (t CaBundleRefType) Equal(o attr.Type) bool {
+	other, ok := o.(CaBundleRefType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t CaBundleRefType) String() string {
+	return "CaBundleRefType"
+}
+
+func (t CaBundleRefType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return nil, diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return nil, diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	namespaceAttribute, ok := attributes["namespace"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`namespace is missing from object`)
+
+		return nil, diags
+	}
+
+	namespaceVal, ok := namespaceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`namespace expected to be basetypes.StringValue, was: %T`, namespaceAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return CaBundleRefValue{
+		Key:       keyVal,
+		Name:      nameVal,
+		Namespace: namespaceVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewCaBundleRefValueNull() CaBundleRefValue {
+	return CaBundleRefValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewCaBundleRefValueUnknown() CaBundleRefValue {
+	return CaBundleRefValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewCaBundleRefValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (CaBundleRefValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing CaBundleRefValue Attribute Value",
+				"While creating a CaBundleRefValue value, a missing attribute value was detected. "+
+					"A CaBundleRefValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("CaBundleRefValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid CaBundleRefValue Attribute Type",
+				"While creating a CaBundleRefValue value, an invalid attribute value was detected. "+
+					"A CaBundleRefValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("CaBundleRefValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("CaBundleRefValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra CaBundleRefValue Attribute Value",
+				"While creating a CaBundleRefValue value, an extra attribute value was detected. "+
+					"A CaBundleRefValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra CaBundleRefValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewCaBundleRefValueUnknown(), diags
+	}
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return NewCaBundleRefValueUnknown(), diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return NewCaBundleRefValueUnknown(), diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	namespaceAttribute, ok := attributes["namespace"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`namespace is missing from object`)
+
+		return NewCaBundleRefValueUnknown(), diags
+	}
+
+	namespaceVal, ok := namespaceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`namespace expected to be basetypes.StringValue, was: %T`, namespaceAttribute))
+	}
+
+	if diags.HasError() {
+		return NewCaBundleRefValueUnknown(), diags
+	}
+
+	return CaBundleRefValue{
+		Key:       keyVal,
+		Name:      nameVal,
+		Namespace: namespaceVal,
+		state:     attr.ValueStateKnown,
+	}, diags
+}
+
+func NewCaBundleRefValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) CaBundleRefValue {
+	object, diags := NewCaBundleRefValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewCaBundleRefValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t CaBundleRefType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewCaBundleRefValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewCaBundleRefValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewCaBundleRefValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewCaBundleRefValueMust(CaBundleRefValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t CaBundleRefType) ValueType(ctx context.Context) attr.Value {
+	return CaBundleRefValue{}
+}
+
+var _ basetypes.ObjectValuable = CaBundleRefValue{}
+
+type CaBundleRefValue struct {
+	Key       basetypes.StringValue `tfsdk:"key"`
+	Name      basetypes.StringValue `tfsdk:"name"`
+	Namespace basetypes.StringValue `tfsdk:"namespace"`
+	state     attr.ValueState
+}
+
+func (v CaBundleRefValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 3)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["key"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["namespace"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 3)
+
+		val, err = v.Key.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["key"] = val
+
+		val, err = v.Name.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["name"] = val
+
+		val, err = v.Namespace.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["namespace"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v CaBundleRefValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v CaBundleRefValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v CaBundleRefValue) String() string {
+	return "CaBundleRefValue"
+}
+
+func (v CaBundleRefValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"key":       basetypes.StringType{},
+		"name":      basetypes.StringType{},
+		"namespace": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"key":       v.Key,
+			"name":      v.Name,
+			"namespace": v.Namespace,
+		})
+
+	return objVal, diags
+}
+
+func (v CaBundleRefValue) Equal(o attr.Value) bool {
+	other, ok := o.(CaBundleRefValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Key.Equal(other.Key) {
+		return false
+	}
+
+	if !v.Name.Equal(other.Name) {
+		return false
+	}
+
+	if !v.Namespace.Equal(other.Namespace) {
+		return false
+	}
+
+	return true
+}
+
+func (v CaBundleRefValue) Type(ctx context.Context) attr.Type {
+	return CaBundleRefType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v CaBundleRefValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"key":       basetypes.StringType{},
+		"name":      basetypes.StringType{},
+		"namespace": basetypes.StringType{},
 	}
 }
 

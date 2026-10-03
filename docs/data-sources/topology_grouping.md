@@ -22,7 +22,6 @@ description: |-
 ### Optional
 
 - `hash` (String) resource content will be returned as it was at the time of this git hash
-- `spec` (Attributes) TopologyGroupingSpec defines the desired state of TopologyGrouping (see [below for nested schema](#nestedatt--spec))
 
 ### Read-Only
 
@@ -31,41 +30,8 @@ description: |-
 - `deviations` (Attributes) (see [below for nested schema](#nestedatt--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--metadata))
+- `spec` (Attributes) TopologyGroupingSpec defines the desired state of TopologyGrouping (see [below for nested schema](#nestedatt--spec))
 - `status` (Attributes) TopologyGroupingStatus defines the observed state of TopologyGrouping (see [below for nested schema](#nestedatt--status))
-
-<a id="nestedatt--spec"></a>
-### Nested Schema for `spec`
-
-Optional:
-
-- `group_selectors` (Attributes List) The set of selectors for assigning nodes to groups (see [below for nested schema](#nestedatt--spec--group_selectors))
-- `tier_selectors` (Attributes List) The set of selectors for assigning nodes to tiers (see [below for nested schema](#nestedatt--spec--tier_selectors))
-- `ui_description` (String) A description of the topology grouping to expose in the UI
-- `ui_description_key` (String) The translation key for the description of the topology grouping to expose in the UI
-- `ui_name` (String) The name of the topology grouping to expose in the UI
-- `ui_name_key` (String) The translation key for the name of the topology grouping to expose in the UI
-
-<a id="nestedatt--spec--group_selectors"></a>
-### Nested Schema for `spec.group_selectors`
-
-Optional:
-
-- `group` (String) The group to assign to nodes that match the selector.  Primarily this is used as a unique
-key to identify which nodes share the same group key and should be put together.
-- `group_ui_name` (String) The name of the group to show in the UI.  If not set, then the UI will display the group
-string above.
-- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this group.
-
-
-<a id="nestedatt--spec--tier_selectors"></a>
-### Nested Schema for `spec.tier_selectors`
-
-Optional:
-
-- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this tier.
-- `tier` (Number) The tier to assign to nodes that match the selector.
-
-
 
 <a id="nestedatt--alarms"></a>
 ### Nested Schema for `alarms`
@@ -95,6 +61,40 @@ Read-Only:
 - `labels` (Map of String)
 - `name` (String)
 - `namespace` (String)
+
+
+<a id="nestedatt--spec"></a>
+### Nested Schema for `spec`
+
+Read-Only:
+
+- `group_selectors` (Attributes List) The set of selectors for assigning nodes to groups (see [below for nested schema](#nestedatt--spec--group_selectors))
+- `tier_selectors` (Attributes List) The set of selectors for assigning nodes to tiers (see [below for nested schema](#nestedatt--spec--tier_selectors))
+- `ui_description` (String) A description of the topology grouping to expose in the UI
+- `ui_description_key` (String) The translation key for the description of the topology grouping to expose in the UI
+- `ui_name` (String) The name of the topology grouping to expose in the UI
+- `ui_name_key` (String) The translation key for the name of the topology grouping to expose in the UI
+
+<a id="nestedatt--spec--group_selectors"></a>
+### Nested Schema for `spec.group_selectors`
+
+Read-Only:
+
+- `group` (String) The group to assign to nodes that match the selector.  Primarily this is used as a unique
+key to identify which nodes share the same group key and should be put together.
+- `group_ui_name` (String) The name of the group to show in the UI.  If not set, then the UI will display the group
+string above.
+- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this group.
+
+
+<a id="nestedatt--spec--tier_selectors"></a>
+### Nested Schema for `spec.tier_selectors`
+
+Read-Only:
+
+- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this tier.
+- `tier` (Number) The tier to assign to nodes that match the selector.
+
 
 
 <a id="nestedatt--status"></a>

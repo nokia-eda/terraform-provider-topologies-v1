@@ -50,6 +50,9 @@ Optional:
 Optional:
 
 - `checks` (Attributes) Configure dry run mode and prompts for topology operations. (see [below for nested schema](#nestedatt--spec--checks))
+- `hmac_secret_ref` (Attributes) HMACSecretRef references a Kubernetes Secret containing the HMAC key the server
+uses to validate request signatures from the caller. When set, the server rejects
+any request whose signature does not match. (see [below for nested schema](#nestedatt--spec--hmac_secret_ref))
 - `link_templates` (Attributes List) Define the link parameters that are meant to be inherited by the topology links referencing the template. These parameters can be overridden at the link level. (see [below for nested schema](#nestedatt--spec--link_templates))
 - `links` (Attributes List) Define the set of topology links to be created/replaced/deleted. A link can reference a link template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--links))
 - `node_templates` (Attributes List) Define the node parameters that are meant to be inherited by the topology nodes referencing the template. These parameters can be overridden at the node level. (see [below for nested schema](#nestedatt--spec--node_templates))
@@ -65,6 +68,8 @@ One of Create, Replace, ReplaceAll, Delete, DeleteAll, Reconcile.
 - `remote_location` (String) http(s) location of the topology input in YAML format to deploy. Providing the remote location will discard any topology resources provided in the spec of the workflow.
 - `satellite_port_templates` (Attributes List) Define the satellite port templates that are meant to be inherited by the satellite nodes referencing the template. These parameters can be overridden at the satellite node level. (see [below for nested schema](#nestedatt--spec--satellite_port_templates))
 - `simulation` (Attributes) Specify simulation topology configuration. (see [below for nested schema](#nestedatt--spec--simulation))
+- `tls` (Attributes) TLS configures optional TLS settings when connecting to an external HTTPS
+server via remoteLocation. When omitted, EDA's internal TLS bundle is used. (see [below for nested schema](#nestedatt--spec--tls))
 
 <a id="nestedatt--spec--checks"></a>
 ### Nested Schema for `spec.checks`
@@ -74,6 +79,19 @@ Optional:
 - `dry_run` (Boolean) Enabling the Dry Run will run the transaction with the calculated changes to the topology resources in the dry run mode and pause the workflow awaiting users confirmation.
 - `prompts` (List of String) Prompts can be configured to request user confirmation before creating, replacing, or deleting topology resources, regardless if Dry Run is enabled or not.
 This can be configured per operation type (BeforeCreate, BeforeReplace, BeforeDelete).
+
+
+<a id="nestedatt--spec--hmac_secret_ref"></a>
+### Nested Schema for `spec.hmac_secret_ref`
+
+Required:
+
+- `key` (String) Key within the Secret's data map.
+- `name` (String) Name of the Secret.
+
+Optional:
+
+- `namespace` (String) Namespace of the Secret. If not provided, the Secret is assumed to be in the same namespace as the Topology.
 
 
 <a id="nestedatt--spec--link_templates"></a>
@@ -479,6 +497,33 @@ Optional:
 
 - `sim_node_interface` (String) The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with "eth1", "eth2",...
 This is the interface name as it will appear in the SimNode.
+
+
+
+<a id="nestedatt--spec--tls"></a>
+### Nested Schema for `spec.tls`
+
+Optional:
+
+- `ca_bundle_ref` (Attributes) CABundleRef references a Kubernetes ConfigMap whose value under the
+given key is a PEM-encoded CA certificate bundle used to verify the
+remote server's TLS certificate. When set, EDA's internal trust bundle is replaced by the provided bundle,
+but the internal client certificate is still presented for mutual TLS. (see [below for nested schema](#nestedatt--spec--tls--ca_bundle_ref))
+- `skip_verify` (Boolean) SkipVerify disables TLS certificate verification for the remote server.
+Intended for non-production environments only.
+
+<a id="nestedatt--spec--tls--ca_bundle_ref"></a>
+### Nested Schema for `spec.tls.ca_bundle_ref`
+
+Required:
+
+- `key` (String) Key within the ConfigMap's data map.
+- `name` (String) Name of the ConfigMap.
+
+Optional:
+
+- `namespace` (String) Namespace of the ConfigMap. If not provided, the ConfigMap is assumed to
+be in the same namespace as the Topology.
 
 
 

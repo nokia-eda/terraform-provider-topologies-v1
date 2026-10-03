@@ -20,10 +20,6 @@ description: |-
 - `name` (String) name of the NetworkTopology
 - `namespace` (String) the namespace scope in which to operate
 
-### Optional
-
-- `spec` (Attributes) (see [below for nested schema](#nestedatt--spec))
-
 ### Read-Only
 
 - `alarms` (Attributes) (see [below for nested schema](#nestedatt--alarms))
@@ -31,389 +27,8 @@ description: |-
 - `deviations` (Attributes) (see [below for nested schema](#nestedatt--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--metadata))
+- `spec` (Attributes) (see [below for nested schema](#nestedatt--spec))
 - `status` (Attributes) NetworkTopologyStatus defines the observed state of NetworkTopology (see [below for nested schema](#nestedatt--status))
-
-<a id="nestedatt--spec"></a>
-### Nested Schema for `spec`
-
-Optional:
-
-- `checks` (Attributes) Configure dry run mode and prompts for topology operations. (see [below for nested schema](#nestedatt--spec--checks))
-- `link_templates` (Attributes List) Define the link parameters that are meant to be inherited by the topology links referencing the template. These parameters can be overridden at the link level. (see [below for nested schema](#nestedatt--spec--link_templates))
-- `links` (Attributes List) Define the set of topology links to be created/replaced/deleted. A link can reference a link template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--links))
-- `node_templates` (Attributes List) Define the node parameters that are meant to be inherited by the topology nodes referencing the template. These parameters can be overridden at the node level. (see [below for nested schema](#nestedatt--spec--node_templates))
-- `nodes` (Attributes List) Define the set of topology nodes to be created/replaced/deleted. A node can reference a node template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--nodes))
-- `operation` (String) Operation to be performed on the Topology.
-Create - creates the topology resources based on the provided specifications.
-Replace - replaces the resources matched by name with the provided specifications.
-ReplaceAll - first removes all existing topology resources and then creates new ones based on the provided specifications.
-Delete - deletes the resources matched by name.
-DeleteAll - deletes all topology resources found in the namespace.
-Reconcile - reconciles the topology resources based on the provided specifications.
-One of Create, Replace, ReplaceAll, Delete, DeleteAll, Reconcile.
-- `remote_location` (String) http(s) location of the topology input in YAML format to deploy. Providing the remote location will discard any topology resources provided in the spec of the workflow.
-- `satellite_port_templates` (Attributes List) Define the satellite port templates that are meant to be inherited by the satellite nodes referencing the template. These parameters can be overridden at the satellite node level. (see [below for nested schema](#nestedatt--spec--satellite_port_templates))
-- `simulation` (Attributes) Specify simulation topology configuration. (see [below for nested schema](#nestedatt--spec--simulation))
-
-<a id="nestedatt--spec--checks"></a>
-### Nested Schema for `spec.checks`
-
-Optional:
-
-- `dry_run` (Boolean) Enabling the Dry Run will run the transaction with the calculated changes to the topology resources in the dry run mode and pause the workflow awaiting users confirmation.
-- `prompts` (List of String) Prompts can be configured to request user confirmation before creating, replacing, or deleting topology resources, regardless if Dry Run is enabled or not.
-This can be configured per operation type (BeforeCreate, BeforeReplace, BeforeDelete).
-
-
-<a id="nestedatt--spec--link_templates"></a>
-### Nested Schema for `spec.link_templates`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the TopoLink.
-- `breakouts` (Attributes List) Breakout endpoints propertiesfor the link (see [below for nested schema](#nestedatt--spec--link_templates--breakouts))
-- `encap_type` (String) Enable or disable VLAN tagging on Interfaces created by the TopoLink.
-- `labels` (Map of String) Labels to assign to the TopoLink.
-- `name` (String) The name of the TopoLinkTemplate.
-- `speed` (String) Speed of the link.
-- `type` (String) Specify the type of link.
-If type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.
-
-<a id="nestedatt--spec--link_templates--breakouts"></a>
-### Nested Schema for `spec.link_templates.breakouts`
-
-Optional:
-
-- `local` (Attributes) Local breakout endpoint properties (see [below for nested schema](#nestedatt--spec--link_templates--breakouts--local))
-- `remote` (Attributes) Remote breakout endpoint properties (see [below for nested schema](#nestedatt--spec--link_templates--breakouts--remote))
-
-<a id="nestedatt--spec--link_templates--breakouts--local"></a>
-### Nested Schema for `spec.link_templates.breakouts.local`
-
-Optional:
-
-- `channels` (Number) The number of breakout channels to create
-- `speed` (String) Speed of each breakout channel
-
-
-<a id="nestedatt--spec--link_templates--breakouts--remote"></a>
-### Nested Schema for `spec.link_templates.breakouts.remote`
-
-Optional:
-
-- `channels` (Number) The number of breakout channels to create
-- `speed` (String) Speed of each breakout channel
-
-
-
-
-<a id="nestedatt--spec--links"></a>
-### Nested Schema for `spec.links`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the TopoLink.
-- `encap_type` (String) Enable or disable VLAN tagging on Interfaces created by the TopoLink
-- `endpoints` (Attributes List) Define the set of physical links making up this TopoLink. (see [below for nested schema](#nestedatt--spec--links--endpoints))
-- `labels` (Map of String) Labels to assign to the TopoLink
-- `name` (String) The name of the TopoLink
-- `template` (String) Reference to a template to use for this TopoLink.
-
-<a id="nestedatt--spec--links--endpoints"></a>
-### Nested Schema for `spec.links.endpoints`
-
-Optional:
-
-- `local` (Attributes) Local, or "A" endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--local))
-- `remote` (Attributes) Remote, or "B" endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--remote))
-- `sim` (Attributes) Sim endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--sim))
-- `speed` (String) Speed of the link.
-- `type` (String) Specify the type of link.
-If type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.
-
-<a id="nestedatt--spec--links--endpoints--local"></a>
-### Nested Schema for `spec.links.endpoints.local`
-
-Optional:
-
-- `interface` (String) Normalized name of the interface/port, e.g. ethernet-1-1.
-- `interface_resource` (String) Reference to a Interface.
-- `node` (String) Reference to a TopoNode.
-
-
-<a id="nestedatt--spec--links--endpoints--remote"></a>
-### Nested Schema for `spec.links.endpoints.remote`
-
-Optional:
-
-- `interface` (String) Normalized name of the interface/port, e.g. ethernet-1-1.
-- `interface_resource` (String) Reference to a Interface.
-- `node` (String) Reference to a TopoNode.
-
-
-<a id="nestedatt--spec--links--endpoints--sim"></a>
-### Nested Schema for `spec.links.endpoints.sim`
-
-Optional:
-
-- `sim_node` (String) The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.
-- `sim_node_interface` (String) The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with "eth1", "eth2", ... .
-This is the interface name as it will appear in the SimNode.
-
-
-
-
-<a id="nestedatt--spec--node_templates"></a>
-### Nested Schema for `spec.node_templates`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the TopoNode.
-- `components` (Attributes List) List of components within the TopoNode.
-Used to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM). (see [below for nested schema](#nestedatt--spec--node_templates--components))
-- `labels` (Map of String) Labels to assign to the TopoNode.
-- `license` (String) Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.
-- `name` (String) The name of the TopoNodeTemplate.
-- `node_profile` (String) Reference to a NodeProfile to use with this TopoNode.
-- `platform` (String) Platform type of this TopoNode, e.g. 7220 IXR-D3L.
-- `satellite_nodes` (Attributes List) List of satellite nodes to be inherited by nodes using this template. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes))
-
-<a id="nestedatt--spec--node_templates--components"></a>
-### Nested Schema for `spec.node_templates.components`
-
-Optional:
-
-- `kind` (String) The kind of Component, e.g. lineCard.
-- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
-e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
-- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
-
-
-<a id="nestedatt--spec--node_templates--satellite_nodes"></a>
-### Nested Schema for `spec.node_templates.satellite_nodes`
-
-Optional:
-
-- `components` (Attributes List) Components for the satellite node. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes--components))
-- `id` (String) ID of the satellite node.
-- `mac_address` (String) MAC Address of the satellite node.
-- `platform` (String) Platform of the satellite node.
-- `port_template` (String) Port template to be used for the satellite node.
-- `satellite_profile` (String) Satellite profile to be used for the satellite node.
-- `type` (String) Type of the satellite node.
-- `uplink_interfaces` (Attributes List) Uplink interfaces to be created for the satellite node. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes--uplink_interfaces))
-
-<a id="nestedatt--spec--node_templates--satellite_nodes--components"></a>
-### Nested Schema for `spec.node_templates.satellite_nodes.components`
-
-Optional:
-
-- `kind` (String) The kind of Component, e.g. lineCard.
-- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
-e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
-- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
-
-
-<a id="nestedatt--spec--node_templates--satellite_nodes--uplink_interfaces"></a>
-### Nested Schema for `spec.node_templates.satellite_nodes.uplink_interfaces`
-
-Optional:
-
-- `host_port` (String) HostPort interface of the satellite uplink.
-- `satellite` (String) Satellite interface of the satellite uplink.
-
-
-
-
-<a id="nestedatt--spec--nodes"></a>
-### Nested Schema for `spec.nodes`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the TopoNode.
-- `components` (Attributes List) List of components within the TopoNode.
-Used to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM). (see [below for nested schema](#nestedatt--spec--nodes--components))
-- `labels` (Map of String) Labels to assign to the TopoNode
-- `license` (String) Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.
-- `mac_address` (String) MAC address to associate with this TopoNode.
-Typically the chassis MAC address, optionally sent by a node in DHCP requests.
-Not required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.
-- `name` (String) The name of the TopoNode
-- `node_profile` (String) Reference to a NodeProfile to use with this TopoNode.
-- `npp` (Attributes) Options relating to NPP interactions with the node. (see [below for nested schema](#nestedatt--spec--nodes--npp))
-- `onboarded` (Boolean) Indicates if this TopoNode has been bootstrapped or is reachable via configured credentials. Set by BootstrapServer when it completes onboarding functions for a given TopoNode.
-Most applications ignore TopoNodes that have not been onboarded yet.
-- `operating_system` (String) Operating system running on this TopoNode, e.g. srl.
-- `platform` (String) Platform type of this TopoNode, e.g. 7220 IXR-D3L.
-- `production_address` (Attributes) Production address of this TopoNode - this is the address the real, production instance of this TopoNode uses.
-If left blank, an address will be allocated from the management IP pool specified in the referenced NodeProfile.
-If this TopoNode is not bootstrapped by EDA this field must be provided. (see [below for nested schema](#nestedatt--spec--nodes--production_address))
-- `satellite_nodes` (Attributes List) List of satellite nodes to be inherited by this TopoNode. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes))
-- `serial_number` (String) Serial number of this TopoNode, optionally sent by a node in DHCP requests.
-Not required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.
-- `system_interface` (String) Deprecated: Name of the Interface resource representing the primary loopback on the TopoNode, this field will be removed in the future version.
-- `template` (String) Reference to a template to use for this TopoNode.
-- `version` (String) Sets the software version of this TopoNode, e.g. 24.7.1 (for srl), or 24.7.r1 (for sros).
-
-<a id="nestedatt--spec--nodes--components"></a>
-### Nested Schema for `spec.nodes.components`
-
-Optional:
-
-- `kind` (String) The kind of Component, e.g. lineCard.
-- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
-e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
-- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
-
-
-<a id="nestedatt--spec--nodes--npp"></a>
-### Nested Schema for `spec.nodes.npp`
-
-Optional:
-
-- `mode` (String) The mode in which this TopoNode is functioning.
-"normal" (the default)
-   indicates that NPP is expecting an endpoint to exist, and will accept and confirm changes only if the endpoint
-   accepts them.
-"maintenance"
-   indicates that no changes will be accepted for the TopoNode, irrespective if the endpoint is up and reachable.
-   The exception is if an upgrade is occuring, in which case changes will be accepted.
-"null"
-	  indicates that changes will be accepted from CRs and no NPP will be spun up. NPP validation will not occur.
-   This may be useful in playground mode to avoid spinning up of 1000s of NPPs.
-"emulate"
-   indicates that changes will be accepted at the NPP level, without pushing them to a endpoint. NPP validation
-   still occurs.  If no IP address is present, we also run in emulate mode.
-"monitor"
-   indicates that state will be collectd but config will not be pushed to a endpoint. NPP validation still occurs.
-
-
-<a id="nestedatt--spec--nodes--production_address"></a>
-### Nested Schema for `spec.nodes.production_address`
-
-Optional:
-
-- `ipv4` (String) The IPv4 production address
-- `ipv6` (String) The IPv6 production address
-
-
-<a id="nestedatt--spec--nodes--satellite_nodes"></a>
-### Nested Schema for `spec.nodes.satellite_nodes`
-
-Optional:
-
-- `components` (Attributes List) Components for the satellite node. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes--components))
-- `id` (String) ID of the satellite node.
-- `mac_address` (String) MAC Address of the satellite node.
-- `platform` (String) Platform of the satellite node.
-- `port_template` (String) Port template to be used for the satellite node.
-- `satellite_profile` (String) Satellite profile to be used for the satellite node.
-- `type` (String) Type of the satellite node.
-- `uplink_interfaces` (Attributes List) Uplink interfaces to be created for the satellite node. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes--uplink_interfaces))
-
-<a id="nestedatt--spec--nodes--satellite_nodes--components"></a>
-### Nested Schema for `spec.nodes.satellite_nodes.components`
-
-Optional:
-
-- `kind` (String) The kind of Component, e.g. lineCard.
-- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
-e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
-- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
-
-
-<a id="nestedatt--spec--nodes--satellite_nodes--uplink_interfaces"></a>
-### Nested Schema for `spec.nodes.satellite_nodes.uplink_interfaces`
-
-Optional:
-
-- `host_port` (String) HostPort interface of the satellite uplink.
-- `satellite` (String) Satellite interface of the satellite uplink.
-
-
-
-
-<a id="nestedatt--spec--satellite_port_templates"></a>
-### Nested Schema for `spec.satellite_port_templates`
-
-Optional:
-
-- `connectors` (Attributes List) List of connector components within the SatellitePortTemplate.
-Used to define the type and location of connectors. (see [below for nested schema](#nestedatt--spec--satellite_port_templates--connectors))
-- `name` (String) The name of the SatellitePortTemplate.
-- `uplinks` (Attributes List) Uplinks for the SatellitePortTemplate. (see [below for nested schema](#nestedatt--spec--satellite_port_templates--uplinks))
-
-<a id="nestedatt--spec--satellite_port_templates--connectors"></a>
-### Nested Schema for `spec.satellite_port_templates.connectors`
-
-Optional:
-
-- `kind` (String) The kind of Component, e.g. lineCard.
-- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
-e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
-- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
-
-
-<a id="nestedatt--spec--satellite_port_templates--uplinks"></a>
-### Nested Schema for `spec.satellite_port_templates.uplinks`
-
-Optional:
-
-- `downlinks` (List of String) Downlinks for the SatelliteUplink.
-- `name` (String) The name of the SatelliteUplink.
-
-
-
-<a id="nestedatt--spec--simulation"></a>
-### Nested Schema for `spec.simulation`
-
-Optional:
-
-- `sim_node_templates` (Attributes List) Define the simulation node (sim node) parameters that are meant to be inherited by the simulation nodes referencing the template. These parameters can be overridden at the sim node level. (see [below for nested schema](#nestedatt--spec--simulation--sim_node_templates))
-- `sim_nodes` (Attributes List) Define the sim node to be created/replaced/deleted. A sim node can reference a sim node template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--simulation--sim_nodes))
-- `topologies` (Attributes List) Define the simulation topology to be created/replaced/deleted by providing the list of nodes/interfaces and their corresponding sim nodes/sim node interfaces. (see [below for nested schema](#nestedatt--spec--simulation--topologies))
-
-<a id="nestedatt--spec--simulation--sim_node_templates"></a>
-### Nested Schema for `spec.simulation.sim_node_templates`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the SimNode.
-- `image` (String) The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.
-- `image_pull_secret` (String) Reference to a Secret to use when pulling the image for this simNode.
-- `labels` (Map of String) Labels to assign to the SimNode.
-- `name` (String) The name of the template.
-- `type` (String) Type defines what is type of this SimNode.
-
-
-<a id="nestedatt--spec--simulation--sim_nodes"></a>
-### Nested Schema for `spec.simulation.sim_nodes`
-
-Optional:
-
-- `annotations` (Map of String) Annotations to assign to the SimNode.
-- `image` (String) The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.
-- `image_pull_secret` (String) Reference to a Secret to use when pulling the image for this simNode
-- `labels` (Map of String) Labels to assign to the SimNode.
-- `name` (String) The name of the SimNode. This is the name that will be used to reference the SimNode in the SimTopology.
-- `template` (String) Reference to a template to use for this SimNode.
-- `type` (String) Type defines what is type of this SimNode
-
-
-<a id="nestedatt--spec--simulation--topologies"></a>
-### Nested Schema for `spec.simulation.topologies`
-
-Optional:
-
-- `interface` (String) Normalized name of an interface/port. This is the normalized name of the interface in the TopoNode, for example 'ethernet-1-1'.
-The value of "*" indicates all interfaces on the TopoNode/s.
-- `node` (String) The TopoNode on which interfaces will be mapped to a SimNode. You may use the value "*" to indicate all TopoNodes.
-- `sim_node` (String) The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.
-- `sim_node_interface` (String) The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with "eth1", "eth2",...
-This is the interface name as it will appear in the SimNode.
-
-
-
 
 <a id="nestedatt--alarms"></a>
 ### Nested Schema for `alarms`
@@ -443,6 +58,427 @@ Read-Only:
 - `labels` (Map of String)
 - `name` (String)
 - `namespace` (String)
+
+
+<a id="nestedatt--spec"></a>
+### Nested Schema for `spec`
+
+Read-Only:
+
+- `checks` (Attributes) Configure dry run mode and prompts for topology operations. (see [below for nested schema](#nestedatt--spec--checks))
+- `hmac_secret_ref` (Attributes) HMACSecretRef references a Kubernetes Secret containing the HMAC key the server
+uses to validate request signatures from the caller. When set, the server rejects
+any request whose signature does not match. (see [below for nested schema](#nestedatt--spec--hmac_secret_ref))
+- `link_templates` (Attributes List) Define the link parameters that are meant to be inherited by the topology links referencing the template. These parameters can be overridden at the link level. (see [below for nested schema](#nestedatt--spec--link_templates))
+- `links` (Attributes List) Define the set of topology links to be created/replaced/deleted. A link can reference a link template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--links))
+- `node_templates` (Attributes List) Define the node parameters that are meant to be inherited by the topology nodes referencing the template. These parameters can be overridden at the node level. (see [below for nested schema](#nestedatt--spec--node_templates))
+- `nodes` (Attributes List) Define the set of topology nodes to be created/replaced/deleted. A node can reference a node template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--nodes))
+- `operation` (String) Operation to be performed on the Topology.
+Create - creates the topology resources based on the provided specifications.
+Replace - replaces the resources matched by name with the provided specifications.
+ReplaceAll - first removes all existing topology resources and then creates new ones based on the provided specifications.
+Delete - deletes the resources matched by name.
+DeleteAll - deletes all topology resources found in the namespace.
+Reconcile - reconciles the topology resources based on the provided specifications.
+One of Create, Replace, ReplaceAll, Delete, DeleteAll, Reconcile.
+- `remote_location` (String) http(s) location of the topology input in YAML format to deploy. Providing the remote location will discard any topology resources provided in the spec of the workflow.
+- `satellite_port_templates` (Attributes List) Define the satellite port templates that are meant to be inherited by the satellite nodes referencing the template. These parameters can be overridden at the satellite node level. (see [below for nested schema](#nestedatt--spec--satellite_port_templates))
+- `simulation` (Attributes) Specify simulation topology configuration. (see [below for nested schema](#nestedatt--spec--simulation))
+- `tls` (Attributes) TLS configures optional TLS settings when connecting to an external HTTPS
+server via remoteLocation. When omitted, EDA's internal TLS bundle is used. (see [below for nested schema](#nestedatt--spec--tls))
+
+<a id="nestedatt--spec--checks"></a>
+### Nested Schema for `spec.checks`
+
+Read-Only:
+
+- `dry_run` (Boolean) Enabling the Dry Run will run the transaction with the calculated changes to the topology resources in the dry run mode and pause the workflow awaiting users confirmation.
+- `prompts` (List of String) Prompts can be configured to request user confirmation before creating, replacing, or deleting topology resources, regardless if Dry Run is enabled or not.
+This can be configured per operation type (BeforeCreate, BeforeReplace, BeforeDelete).
+
+
+<a id="nestedatt--spec--hmac_secret_ref"></a>
+### Nested Schema for `spec.hmac_secret_ref`
+
+Read-Only:
+
+- `key` (String) Key within the Secret's data map.
+- `name` (String) Name of the Secret.
+- `namespace` (String) Namespace of the Secret. If not provided, the Secret is assumed to be in the same namespace as the Topology.
+
+
+<a id="nestedatt--spec--link_templates"></a>
+### Nested Schema for `spec.link_templates`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the TopoLink.
+- `breakouts` (Attributes List) Breakout endpoints propertiesfor the link (see [below for nested schema](#nestedatt--spec--link_templates--breakouts))
+- `encap_type` (String) Enable or disable VLAN tagging on Interfaces created by the TopoLink.
+- `labels` (Map of String) Labels to assign to the TopoLink.
+- `name` (String) The name of the TopoLinkTemplate.
+- `speed` (String) Speed of the link.
+- `type` (String) Specify the type of link.
+If type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.
+
+<a id="nestedatt--spec--link_templates--breakouts"></a>
+### Nested Schema for `spec.link_templates.breakouts`
+
+Read-Only:
+
+- `local` (Attributes) Local breakout endpoint properties (see [below for nested schema](#nestedatt--spec--link_templates--breakouts--local))
+- `remote` (Attributes) Remote breakout endpoint properties (see [below for nested schema](#nestedatt--spec--link_templates--breakouts--remote))
+
+<a id="nestedatt--spec--link_templates--breakouts--local"></a>
+### Nested Schema for `spec.link_templates.breakouts.local`
+
+Read-Only:
+
+- `channels` (Number) The number of breakout channels to create
+- `speed` (String) Speed of each breakout channel
+
+
+<a id="nestedatt--spec--link_templates--breakouts--remote"></a>
+### Nested Schema for `spec.link_templates.breakouts.remote`
+
+Read-Only:
+
+- `channels` (Number) The number of breakout channels to create
+- `speed` (String) Speed of each breakout channel
+
+
+
+
+<a id="nestedatt--spec--links"></a>
+### Nested Schema for `spec.links`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the TopoLink.
+- `encap_type` (String) Enable or disable VLAN tagging on Interfaces created by the TopoLink
+- `endpoints` (Attributes List) Define the set of physical links making up this TopoLink. (see [below for nested schema](#nestedatt--spec--links--endpoints))
+- `labels` (Map of String) Labels to assign to the TopoLink
+- `name` (String) The name of the TopoLink
+- `template` (String) Reference to a template to use for this TopoLink.
+
+<a id="nestedatt--spec--links--endpoints"></a>
+### Nested Schema for `spec.links.endpoints`
+
+Read-Only:
+
+- `local` (Attributes) Local, or "A" endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--local))
+- `remote` (Attributes) Remote, or "B" endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--remote))
+- `sim` (Attributes) Sim endpoint of the link. (see [below for nested schema](#nestedatt--spec--links--endpoints--sim))
+- `speed` (String) Speed of the link.
+- `type` (String) Specify the type of link.
+If type is set to edge, topology information for the remote device can be set; when doing so the Remote Node can be set as the hostname of the remote device and Remote Interface as the remote interface name in the device specific format, e.g. eth0.
+
+<a id="nestedatt--spec--links--endpoints--local"></a>
+### Nested Schema for `spec.links.endpoints.local`
+
+Read-Only:
+
+- `interface` (String) Normalized name of the interface/port, e.g. ethernet-1-1.
+- `interface_resource` (String) Reference to a Interface.
+- `node` (String) Reference to a TopoNode.
+
+
+<a id="nestedatt--spec--links--endpoints--remote"></a>
+### Nested Schema for `spec.links.endpoints.remote`
+
+Read-Only:
+
+- `interface` (String) Normalized name of the interface/port, e.g. ethernet-1-1.
+- `interface_resource` (String) Reference to a Interface.
+- `node` (String) Reference to a TopoNode.
+
+
+<a id="nestedatt--spec--links--endpoints--sim"></a>
+### Nested Schema for `spec.links.endpoints.sim`
+
+Read-Only:
+
+- `sim_node` (String) The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.
+- `sim_node_interface` (String) The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with "eth1", "eth2", ... .
+This is the interface name as it will appear in the SimNode.
+
+
+
+
+<a id="nestedatt--spec--node_templates"></a>
+### Nested Schema for `spec.node_templates`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the TopoNode.
+- `components` (Attributes List) List of components within the TopoNode.
+Used to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM). (see [below for nested schema](#nestedatt--spec--node_templates--components))
+- `labels` (Map of String) Labels to assign to the TopoNode.
+- `license` (String) Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.
+- `name` (String) The name of the TopoNodeTemplate.
+- `node_profile` (String) Reference to a NodeProfile to use with this TopoNode.
+- `platform` (String) Platform type of this TopoNode, e.g. 7220 IXR-D3L.
+- `satellite_nodes` (Attributes List) List of satellite nodes to be inherited by nodes using this template. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes))
+
+<a id="nestedatt--spec--node_templates--components"></a>
+### Nested Schema for `spec.node_templates.components`
+
+Read-Only:
+
+- `kind` (String) The kind of Component, e.g. lineCard.
+- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
+e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
+- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
+
+
+<a id="nestedatt--spec--node_templates--satellite_nodes"></a>
+### Nested Schema for `spec.node_templates.satellite_nodes`
+
+Read-Only:
+
+- `components` (Attributes List) Components for the satellite node. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes--components))
+- `id` (String) ID of the satellite node.
+- `mac_address` (String) MAC Address of the satellite node.
+- `platform` (String) Platform of the satellite node.
+- `port_template` (String) Port template to be used for the satellite node.
+- `satellite_profile` (String) Satellite profile to be used for the satellite node.
+- `type` (String) Type of the satellite node.
+- `uplink_interfaces` (Attributes List) Uplink interfaces to be created for the satellite node. (see [below for nested schema](#nestedatt--spec--node_templates--satellite_nodes--uplink_interfaces))
+
+<a id="nestedatt--spec--node_templates--satellite_nodes--components"></a>
+### Nested Schema for `spec.node_templates.satellite_nodes.components`
+
+Read-Only:
+
+- `kind` (String) The kind of Component, e.g. lineCard.
+- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
+e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
+- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
+
+
+<a id="nestedatt--spec--node_templates--satellite_nodes--uplink_interfaces"></a>
+### Nested Schema for `spec.node_templates.satellite_nodes.uplink_interfaces`
+
+Read-Only:
+
+- `host_port` (String) HostPort interface of the satellite uplink.
+- `satellite` (String) Satellite interface of the satellite uplink.
+
+
+
+
+<a id="nestedatt--spec--nodes"></a>
+### Nested Schema for `spec.nodes`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the TopoNode.
+- `components` (Attributes List) List of components within the TopoNode.
+Used to define the type and location of linecards, fabrics (SFM), media adapter cards (MDA) and control cards (CPM). (see [below for nested schema](#nestedatt--spec--nodes--components))
+- `labels` (Map of String) Labels to assign to the TopoNode
+- `license` (String) Reference to a ConfigMap containing a license for the TopoNode. Overrides the license set in the referenced NodeProfile, if present.
+- `mac_address` (String) MAC address to associate with this TopoNode.
+Typically the chassis MAC address, optionally sent by a node in DHCP requests.
+Not required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.
+- `name` (String) The name of the TopoNode
+- `node_profile` (String) Reference to a NodeProfile to use with this TopoNode.
+- `npp` (Attributes) Options relating to NPP interactions with the node. (see [below for nested schema](#nestedatt--spec--nodes--npp))
+- `onboarded` (Boolean) Indicates if this TopoNode has been bootstrapped or is reachable via configured credentials. Set by BootstrapServer when it completes onboarding functions for a given TopoNode.
+Most applications ignore TopoNodes that have not been onboarded yet.
+- `operating_system` (String) Operating system running on this TopoNode, e.g. srl.
+- `platform` (String) Platform type of this TopoNode, e.g. 7220 IXR-D3L.
+- `production_address` (Attributes) Production address of this TopoNode - this is the address the real, production instance of this TopoNode uses.
+If left blank, an address will be allocated from the management IP pool specified in the referenced NodeProfile.
+If this TopoNode is not bootstrapped by EDA this field must be provided. (see [below for nested schema](#nestedatt--spec--nodes--production_address))
+- `satellite_nodes` (Attributes List) List of satellite nodes to be inherited by this TopoNode. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes))
+- `serial_number` (String) Serial number of this TopoNode, optionally sent by a node in DHCP requests.
+Not required when a TopoNode is not being bootstrapped by EDA, or is simulated through CX.
+- `system_interface` (String) Deprecated: Name of the Interface resource representing the primary loopback on the TopoNode, this field will be removed in the future version.
+- `template` (String) Reference to a template to use for this TopoNode.
+- `version` (String) Sets the software version of this TopoNode, e.g. 24.7.1 (for srl), or 24.7.r1 (for sros).
+
+<a id="nestedatt--spec--nodes--components"></a>
+### Nested Schema for `spec.nodes.components`
+
+Read-Only:
+
+- `kind` (String) The kind of Component, e.g. lineCard.
+- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
+e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
+- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
+
+
+<a id="nestedatt--spec--nodes--npp"></a>
+### Nested Schema for `spec.nodes.npp`
+
+Read-Only:
+
+- `mode` (String) The mode in which this TopoNode is functioning.
+"normal" (the default)
+   indicates that NPP is expecting an endpoint to exist, and will accept and confirm changes only if the endpoint
+   accepts them.
+"maintenance"
+   indicates that no changes will be accepted for the TopoNode, irrespective if the endpoint is up and reachable.
+   The exception is if an upgrade is occuring, in which case changes will be accepted.
+"null"
+	  indicates that changes will be accepted from CRs and no NPP will be spun up. NPP validation will not occur.
+   This may be useful in playground mode to avoid spinning up of 1000s of NPPs.
+"emulate"
+   indicates that changes will be accepted at the NPP level, without pushing them to a endpoint. NPP validation
+   still occurs.  If no IP address is present, we also run in emulate mode.
+"monitor"
+   indicates that state will be collectd but config will not be pushed to a endpoint. NPP validation still occurs.
+
+
+<a id="nestedatt--spec--nodes--production_address"></a>
+### Nested Schema for `spec.nodes.production_address`
+
+Read-Only:
+
+- `ipv4` (String) The IPv4 production address
+- `ipv6` (String) The IPv6 production address
+
+
+<a id="nestedatt--spec--nodes--satellite_nodes"></a>
+### Nested Schema for `spec.nodes.satellite_nodes`
+
+Read-Only:
+
+- `components` (Attributes List) Components for the satellite node. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes--components))
+- `id` (String) ID of the satellite node.
+- `mac_address` (String) MAC Address of the satellite node.
+- `platform` (String) Platform of the satellite node.
+- `port_template` (String) Port template to be used for the satellite node.
+- `satellite_profile` (String) Satellite profile to be used for the satellite node.
+- `type` (String) Type of the satellite node.
+- `uplink_interfaces` (Attributes List) Uplink interfaces to be created for the satellite node. (see [below for nested schema](#nestedatt--spec--nodes--satellite_nodes--uplink_interfaces))
+
+<a id="nestedatt--spec--nodes--satellite_nodes--components"></a>
+### Nested Schema for `spec.nodes.satellite_nodes.components`
+
+Read-Only:
+
+- `kind` (String) The kind of Component, e.g. lineCard.
+- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
+e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
+- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
+
+
+<a id="nestedatt--spec--nodes--satellite_nodes--uplink_interfaces"></a>
+### Nested Schema for `spec.nodes.satellite_nodes.uplink_interfaces`
+
+Read-Only:
+
+- `host_port` (String) HostPort interface of the satellite uplink.
+- `satellite` (String) Satellite interface of the satellite uplink.
+
+
+
+
+<a id="nestedatt--spec--satellite_port_templates"></a>
+### Nested Schema for `spec.satellite_port_templates`
+
+Read-Only:
+
+- `connectors` (Attributes List) List of connector components within the SatellitePortTemplate.
+Used to define the type and location of connectors. (see [below for nested schema](#nestedatt--spec--satellite_port_templates--connectors))
+- `name` (String) The name of the SatellitePortTemplate.
+- `uplinks` (Attributes List) Uplinks for the SatellitePortTemplate. (see [below for nested schema](#nestedatt--spec--satellite_port_templates--uplinks))
+
+<a id="nestedatt--spec--satellite_port_templates--connectors"></a>
+### Nested Schema for `spec.satellite_port_templates.connectors`
+
+Read-Only:
+
+- `kind` (String) The kind of Component, e.g. lineCard.
+- `slot` (String) The slot this Component resides in, unset for Components that do not have a slot or ID.
+e.g. 1 would denote the linecard slot 1, 1/1 would denote linecard slot 1 mda slot 1.
+- `type` (String) Denotes the type of hardware being provisioned, e.g. xcm-x20.
+
+
+<a id="nestedatt--spec--satellite_port_templates--uplinks"></a>
+### Nested Schema for `spec.satellite_port_templates.uplinks`
+
+Read-Only:
+
+- `downlinks` (List of String) Downlinks for the SatelliteUplink.
+- `name` (String) The name of the SatelliteUplink.
+
+
+
+<a id="nestedatt--spec--simulation"></a>
+### Nested Schema for `spec.simulation`
+
+Read-Only:
+
+- `sim_node_templates` (Attributes List) Define the simulation node (sim node) parameters that are meant to be inherited by the simulation nodes referencing the template. These parameters can be overridden at the sim node level. (see [below for nested schema](#nestedatt--spec--simulation--sim_node_templates))
+- `sim_nodes` (Attributes List) Define the sim node to be created/replaced/deleted. A sim node can reference a sim node template to inherit its parameters. (see [below for nested schema](#nestedatt--spec--simulation--sim_nodes))
+- `topologies` (Attributes List) Define the simulation topology to be created/replaced/deleted by providing the list of nodes/interfaces and their corresponding sim nodes/sim node interfaces. (see [below for nested schema](#nestedatt--spec--simulation--topologies))
+
+<a id="nestedatt--spec--simulation--sim_node_templates"></a>
+### Nested Schema for `spec.simulation.sim_node_templates`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the SimNode.
+- `image` (String) The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.
+- `image_pull_secret` (String) Reference to a Secret to use when pulling the image for this simNode.
+- `labels` (Map of String) Labels to assign to the SimNode.
+- `name` (String) The name of the template.
+- `type` (String) Type defines what is type of this SimNode.
+
+
+<a id="nestedatt--spec--simulation--sim_nodes"></a>
+### Nested Schema for `spec.simulation.sim_nodes`
+
+Read-Only:
+
+- `annotations` (Map of String) Annotations to assign to the SimNode.
+- `image` (String) The image to use for this SimNode. This is the full path to the image as it would be provided to the container runtime.
+- `image_pull_secret` (String) Reference to a Secret to use when pulling the image for this simNode
+- `labels` (Map of String) Labels to assign to the SimNode.
+- `name` (String) The name of the SimNode. This is the name that will be used to reference the SimNode in the SimTopology.
+- `template` (String) Reference to a template to use for this SimNode.
+- `type` (String) Type defines what is type of this SimNode
+
+
+<a id="nestedatt--spec--simulation--topologies"></a>
+### Nested Schema for `spec.simulation.topologies`
+
+Read-Only:
+
+- `interface` (String) Normalized name of an interface/port. This is the normalized name of the interface in the TopoNode, for example 'ethernet-1-1'.
+The value of "*" indicates all interfaces on the TopoNode/s.
+- `node` (String) The TopoNode on which interfaces will be mapped to a SimNode. You may use the value "*" to indicate all TopoNodes.
+- `sim_node` (String) The SimNode to which the interface will be mapped. This is the name of the SimNode as it is defined in the SimTopology.
+- `sim_node_interface` (String) The name of the interface to present to the SimNode to which the interface will be mapped. If not provided the interface name will be generated starting with "eth1", "eth2",...
+This is the interface name as it will appear in the SimNode.
+
+
+
+<a id="nestedatt--spec--tls"></a>
+### Nested Schema for `spec.tls`
+
+Read-Only:
+
+- `ca_bundle_ref` (Attributes) CABundleRef references a Kubernetes ConfigMap whose value under the
+given key is a PEM-encoded CA certificate bundle used to verify the
+remote server's TLS certificate. When set, EDA's internal trust bundle is replaced by the provided bundle,
+but the internal client certificate is still presented for mutual TLS. (see [below for nested schema](#nestedatt--spec--tls--ca_bundle_ref))
+- `skip_verify` (Boolean) SkipVerify disables TLS certificate verification for the remote server.
+Intended for non-production environments only.
+
+<a id="nestedatt--spec--tls--ca_bundle_ref"></a>
+### Nested Schema for `spec.tls.ca_bundle_ref`
+
+Read-Only:
+
+- `key` (String) Key within the ConfigMap's data map.
+- `name` (String) Name of the ConfigMap.
+- `namespace` (String) Namespace of the ConfigMap. If not provided, the ConfigMap is assumed to
+be in the same namespace as the Topology.
+
+
 
 
 <a id="nestedatt--status"></a>

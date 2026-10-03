@@ -31,10 +31,6 @@ description: |-
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `spec` (Attributes) TopologyGroupingSpec defines the desired state of TopologyGrouping (see [below for nested schema](#nestedatt--items--spec))
-
 Read-Only:
 
 - `alarms` (Attributes) (see [below for nested schema](#nestedatt--items--alarms))
@@ -42,41 +38,8 @@ Read-Only:
 - `deviations` (Attributes) (see [below for nested schema](#nestedatt--items--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--items--metadata))
+- `spec` (Attributes) TopologyGroupingSpec defines the desired state of TopologyGrouping (see [below for nested schema](#nestedatt--items--spec))
 - `status` (Attributes) TopologyGroupingStatus defines the observed state of TopologyGrouping (see [below for nested schema](#nestedatt--items--status))
-
-<a id="nestedatt--items--spec"></a>
-### Nested Schema for `items.spec`
-
-Optional:
-
-- `group_selectors` (Attributes List) The set of selectors for assigning nodes to groups (see [below for nested schema](#nestedatt--items--spec--group_selectors))
-- `tier_selectors` (Attributes List) The set of selectors for assigning nodes to tiers (see [below for nested schema](#nestedatt--items--spec--tier_selectors))
-- `ui_description` (String) A description of the topology grouping to expose in the UI
-- `ui_description_key` (String) The translation key for the description of the topology grouping to expose in the UI
-- `ui_name` (String) The name of the topology grouping to expose in the UI
-- `ui_name_key` (String) The translation key for the name of the topology grouping to expose in the UI
-
-<a id="nestedatt--items--spec--group_selectors"></a>
-### Nested Schema for `items.spec.group_selectors`
-
-Optional:
-
-- `group` (String) The group to assign to nodes that match the selector.  Primarily this is used as a unique
-key to identify which nodes share the same group key and should be put together.
-- `group_ui_name` (String) The name of the group to show in the UI.  If not set, then the UI will display the group
-string above.
-- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this group.
-
-
-<a id="nestedatt--items--spec--tier_selectors"></a>
-### Nested Schema for `items.spec.tier_selectors`
-
-Optional:
-
-- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this tier.
-- `tier` (Number) The tier to assign to nodes that match the selector.
-
-
 
 <a id="nestedatt--items--alarms"></a>
 ### Nested Schema for `items.alarms`
@@ -106,6 +69,40 @@ Read-Only:
 - `labels` (Map of String)
 - `name` (String)
 - `namespace` (String)
+
+
+<a id="nestedatt--items--spec"></a>
+### Nested Schema for `items.spec`
+
+Read-Only:
+
+- `group_selectors` (Attributes List) The set of selectors for assigning nodes to groups (see [below for nested schema](#nestedatt--items--spec--group_selectors))
+- `tier_selectors` (Attributes List) The set of selectors for assigning nodes to tiers (see [below for nested schema](#nestedatt--items--spec--tier_selectors))
+- `ui_description` (String) A description of the topology grouping to expose in the UI
+- `ui_description_key` (String) The translation key for the description of the topology grouping to expose in the UI
+- `ui_name` (String) The name of the topology grouping to expose in the UI
+- `ui_name_key` (String) The translation key for the name of the topology grouping to expose in the UI
+
+<a id="nestedatt--items--spec--group_selectors"></a>
+### Nested Schema for `items.spec.group_selectors`
+
+Read-Only:
+
+- `group` (String) The group to assign to nodes that match the selector.  Primarily this is used as a unique
+key to identify which nodes share the same group key and should be put together.
+- `group_ui_name` (String) The name of the group to show in the UI.  If not set, then the UI will display the group
+string above.
+- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this group.
+
+
+<a id="nestedatt--items--spec--tier_selectors"></a>
+### Nested Schema for `items.spec.tier_selectors`
+
+Read-Only:
+
+- `node_selector` (List of String) Label selector to use to match nodes that should be assigned to this tier.
+- `tier` (Number) The tier to assign to nodes that match the selector.
+
 
 
 <a id="nestedatt--items--status"></a>
